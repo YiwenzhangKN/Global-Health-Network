@@ -207,7 +207,7 @@ def read_worldbank_countries():
 
 
 def read_worldbank(countries):
-    """Read World Bank indicators while checking for ISO3 country codes.
+    """Read World Bank indicators while checking for ISO3 country codes
 
     Parameters
     countries: Set of strings
@@ -226,7 +226,7 @@ def read_worldbank(countries):
             for r in page[1] or []:
                 if r.get("countryiso3code") in countries and r.get("value") is not None:
                     rows.append((r["countryiso3code"], int(r["date"]), name, float(r["value"])))
-    return pd.DataFrame(rows, columns=["iso3", "year", "column", "value"])
+    return pd.DataFrame(rows, columns=["iso3", "year", "column", "value"]) 
 
 
 def pick_total_rows(records):

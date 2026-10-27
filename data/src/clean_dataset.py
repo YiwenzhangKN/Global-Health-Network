@@ -148,7 +148,7 @@ def main():
     table = fill_missing(table, meta.loc[table.index, "income_group"]).copy()
     print(f"Filled values: {n_filled}")
 
-    # 4) save: raw scale and log-transformed
+    # 
     clean = meta.loc[table.index].join(table).reset_index()
     clean.to_csv(OUT_DIR / f"clean_{YEAR}.csv", index=False)
 
