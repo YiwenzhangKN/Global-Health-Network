@@ -1,0 +1,30 @@
+indicator,cause,expected,rho,found,right_direction
+dtp3_coverage,diphtheria,-,-0.281,False,True
+dtp3_coverage,tetanus,-,-0.316,False,True
+dtp3_coverage,whooping cough,-,-0.358,True,True
+measles_coverage,measles,-,-0.159,False,True
+skilled_birth_attendance,maternal conditions,-,-0.382,True,True
+skilled_birth_attendance,birth asphyxia and birth trauma,-,-0.278,False,True
+skilled_birth_attendance,neonatal sepsis and infections,-,-0.247,False,True
+basic_water_access,diarrhoeal diseases,-,-0.205,False,True
+basic_sanitation_access,diarrhoeal diseases,-,-0.336,False,True
+avail_dialysis,chronic kidney disease due to diabetes,-,-0.021,False,True
+avail_dialysis,other chronic kidney disease,-,0.066,False,False
+avail_insulin,diabetes mellitus,-,0.061,False,False
+avail_thrombolysis,ischaemic stroke,-,0.109,False,False
+avail_coronary_bypass_stent,ischaemic heart disease,-,0.093,False,False
+avail_cervical_cytology,cervix uteri cancer,-,0.16,False,False
+avail_bronchodilators,asthma,-,-0.004,False,True
+tb_incidence,tuberculosis,+,0.819,True,True
+hiv_prevalence_15_49,hiv aids,+,0.792,True,True
+hepb_prevalence,liver cancer secondary to hepatitis b,+,0.339,False,True
+hepb_prevalence,cirrhosis due to hepatitis b,+,0.483,True,True
+alcohol_per_capita,alcohol use disorders,+,0.546,True,True
+alcohol_per_capita,cirrhosis due to alcohol use,+,0.372,True,True
+tobacco_prevalence,trachea bronchus lung cancers,+,0.56,True,True
+tobacco_prevalence,chronic obstructive pulmonary disease,+,0.084,False,True
+pm25_exposure,chronic obstructive pulmonary disease,+,-0.033,False,False
+raised_glucose_prevalence,diabetes mellitus,+,0.4,True,True
+obesity_prevalence,diabetes mellitus,+,0.37,True,True
+stunting_prevalence,protein energy malnutrition,+,0.341,False,True
+battle_deaths_per100k,collective violence and legal intervention,+,0.487,True,True

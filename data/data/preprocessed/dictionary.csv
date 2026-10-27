@@ -1,0 +1,300 @@
+column,group,source,code
+health_exp_pct_gdp,system_input,World Bank,SH.XPD.CHEX.GD.ZS
+health_exp_pc_ppp,system_input,World Bank,SH.XPD.CHEX.PP.CD
+out_of_pocket_pct_che,system_input,World Bank,SH.XPD.OOPC.CH.ZS
+gov_health_exp_pct_che,system_input,World Bank,SH.XPD.GHED.CH.ZS
+external_health_exp_pct_che,system_input,World Bank,SH.XPD.EHEX.CH.ZS
+dtp3_coverage,system_output,World Bank,SH.IMM.IDPT
+measles_coverage,system_output,World Bank,SH.IMM.MEAS
+skilled_birth_attendance,system_output,World Bank,SH.STA.BRTC.ZS
+under5_mortality,outcome,World Bank,SH.DYN.MORT
+infant_mortality,outcome,World Bank,SP.DYN.IMRT.IN
+maternal_mortality_ratio,outcome,World Bank,SH.STA.MMRT
+tb_incidence,outcome,World Bank,SH.TBS.INCD
+hiv_prevalence_15_49,outcome,World Bank,SH.DYN.AIDS.ZS
+pm25_exposure,risk_factor,World Bank,EN.ATM.PM25.MC.M3
+basic_water_access,risk_factor,World Bank,SH.H2O.BASW.ZS
+basic_sanitation_access,risk_factor,World Bank,SH.STA.BASS.ZS
+gdp_pc_ppp,context,World Bank,NY.GDP.PCAP.PP.KD
+gdp_growth,context,World Bank,NY.GDP.MKTP.KD.ZG
+extreme_poverty,context,World Bank,SI.POV.DDAY
+population,context,World Bank,SP.POP.TOTL
+pop_65plus_pct,context,World Bank,SP.POP.65UP.TO.ZS
+urban_pct,context,World Bank,SP.URB.TOTL.IN.ZS
+fertility_rate,context,World Bank,SP.DYN.TFRT.IN
+battle_deaths,context,World Bank,VC.BTL.DETH
+government_effectiveness,context,World Bank,GOV_WGI_GE_SC
+death_registration_completeness,data_quality,World Bank,SP.REG.DTHS.ZS
+life_expectancy,outcome,WHO GHO,WHOSIS_000001
+hale,outcome,WHO GHO,WHOSIS_000002
+ncd_mortality_30_70,outcome,WHO GHO,NCDMORT3070
+hepb_prevalence,outcome,WHO GHO,SDGHEPHBSAGPRV
+wash_mortality,outcome,WHO GHO,SDGWSHBOD
+air_pollution_mortality,outcome,WHO GHO,AIR_42
+beds_per10k,system_input,WHO GHO,WHS6_102
+doctors_per10k,system_input,WHO GHO,HWF_0001
+nurses_per10k,system_input,WHO GHO,HWF_0006
+dentists_per10k,system_input,WHO GHO,HWF_0010
+pharmacists_per10k,system_input,WHO GHO,HWF_0014
+psychiatrists_per100k,system_input,WHO GHO,MH_6
+mri_per1m,system_input,WHO GHO,DEVICES08
+ct_per1m,system_input,WHO GHO,DEVICES09
+pet_per1m,system_input,WHO GHO,DEVICES10
+gamma_camera_per1m,system_input,WHO GHO,DEVICES11
+linear_accelerator_per1m,system_input,WHO GHO,DEVICES12
+telecobalt_per1m,system_input,WHO GHO,DEVICES21
+radiotherapy_per1m,system_input,WHO GHO,DEVICES22
+avail_dialysis,treatment_availability,WHO GHO,NCD_CCS_dialysis
+avail_kidney_transplant,treatment_availability,WHO GHO,NCD_CCS_renaltrans
+avail_chemotherapy,treatment_availability,WHO GHO,NCD_CCS_chemo
+avail_coronary_bypass_stent,treatment_availability,WHO GHO,NCD_CCS_coronary
+avail_thrombolysis,treatment_availability,WHO GHO,NCD_CCS_thrombolytic
+avail_stroke_care,treatment_availability,WHO GHO,NCD_CCS_stroke
+avail_insulin,treatment_availability,WHO GHO,NCD_CCS_Insulin
+avail_metformin,treatment_availability,WHO GHO,NCD_CCS_Metformin
+avail_statins,treatment_availability,WHO GHO,NCD_CCS_Statins
+avail_ace_inhibitors,treatment_availability,WHO GHO,NCD_CCS_ACE
+avail_bronchodilators,treatment_availability,WHO GHO,NCD_CCS_Bronchodilators
+avail_diabetes_testing,treatment_availability,WHO GHO,NCD_CCS_DiabetesTest
+avail_cervical_cytology,treatment_availability,WHO GHO,NCD_CCS_CervCy
+avail_breast_screening,treatment_availability,WHO GHO,NCD_CCS_BreastCancer
+avail_colon_screening,treatment_availability,WHO GHO,NCD_CCS_BowelCancer
+avail_palliative_care,treatment_availability,WHO GHO,NCD_CCS_palliative_prim
+cancer_registry,treatment_availability,WHO GHO,NCD_CCS_CancerRegNational
+uhc_index,system_output,WHO GHO,UHC_INDEX_REPORTED
+uhc_sub_rmnch,system_output,WHO GHO,UHC_SCI_RMNCH
+uhc_sub_infectious,system_output,WHO GHO,UHC_SCI_INFECT
+uhc_sub_ncd,system_output,WHO GHO,UHC_SCI_NCD
+uhc_sub_capacity,system_output,WHO GHO,UHC_SCI_CAPACITY
+ihr_capacity,system_output,WHO GHO,SDGIHR
+hepb3_coverage,system_output,WHO GHO,WHS4_117
+hib3_coverage,system_output,WHO GHO,WHS4_129
+pcv3_coverage,system_output,WHO GHO,PCV3
+rota_coverage,system_output,WHO GHO,ROTAC
+mcv2_coverage,system_output,WHO GHO,MCV2
+hpv_coverage,system_output,WHO GHO,SDGHPVRECEIVED
+caesarean_rate,system_output,WHO GHO,WHS4_115
+hypertension_prevalence,risk_factor,WHO GHO,NCD_HYP_PREVALENCE_A
+obesity_prevalence,risk_factor,WHO GHO,NCD_BMI_30A
+raised_glucose_prevalence,risk_factor,WHO GHO,NCD_GLUC_04
+mean_bmi,risk_factor,WHO GHO,NCD_BMI_MEAN
+underweight_prevalence,risk_factor,WHO GHO,NCD_BMI_18A
+insufficient_activity,risk_factor,WHO GHO,NCD_PAA
+stunting_prevalence,risk_factor,WHO GHO,NUTSTUNTINGPREV
+tobacco_prevalence,risk_factor,WHO GHO,M_Est_tob_curr_std
+alcohol_per_capita,risk_factor,WHO GHO,SA_0000001688
+hdi,context,OWID,human-development-index
+death_asdr_all_causes,cause_of_death,WHO GHE 2023,All Causes
+death_asdr_communicable_maternal_perinatal_and_nutritional_conditions,cause_of_death,WHO GHE 2023,"Communicable, maternal, perinatal and nutritional conditions"
+death_asdr_infectious_and_parasitic_diseases,cause_of_death,WHO GHE 2023,Infectious and parasitic diseases
+death_asdr_tuberculosis,cause_of_death,WHO GHE 2023,Tuberculosis
+death_asdr_stds_excluding_hiv,cause_of_death,WHO GHE 2023,STDs excluding HIV
+death_asdr_syphilis,cause_of_death,WHO GHE 2023,Syphilis
+death_asdr_chlamydia,cause_of_death,WHO GHE 2023,Chlamydia
+death_asdr_gonorrhoea,cause_of_death,WHO GHE 2023,Gonorrhoea
+death_asdr_trichomoniasis,cause_of_death,WHO GHE 2023,Trichomoniasis
+death_asdr_gential_herpes,cause_of_death,WHO GHE 2023,Gential Herpes
+death_asdr_other_stds,cause_of_death,WHO GHE 2023,Other STDs
+death_asdr_hiv_aids,cause_of_death,WHO GHE 2023,HIV/AIDS
+death_asdr_diarrhoeal_diseases,cause_of_death,WHO GHE 2023,Diarrhoeal diseases
+death_asdr_childhood_cluster_diseases,cause_of_death,WHO GHE 2023,Childhood-cluster diseases
+death_asdr_whooping_cough,cause_of_death,WHO GHE 2023,Whooping cough
+death_asdr_diphtheria,cause_of_death,WHO GHE 2023,Diphtheria
+death_asdr_measles,cause_of_death,WHO GHE 2023,Measles
+death_asdr_tetanus,cause_of_death,WHO GHE 2023,Tetanus
+death_asdr_meningitis,cause_of_death,WHO GHE 2023,Meningitis
+death_asdr_encephalitis,cause_of_death,WHO GHE 2023,Encephalitis
+death_asdr_hepatitis,cause_of_death,WHO GHE 2023,Hepatitis
+death_asdr_acute_hepatitis_a,cause_of_death,WHO GHE 2023,Acute hepatitis A
+death_asdr_acute_hepatitis_b,cause_of_death,WHO GHE 2023,Acute hepatitis B
+death_asdr_acute_hepatitis_c,cause_of_death,WHO GHE 2023,Acute hepatitis C
+death_asdr_acute_hepatitis_e,cause_of_death,WHO GHE 2023,Acute hepatitis E
+death_asdr_parasitic_and_vector_diseases,cause_of_death,WHO GHE 2023,Parasitic and vector diseases
+death_asdr_malaria,cause_of_death,WHO GHE 2023,Malaria
+death_asdr_trypanosomiasis,cause_of_death,WHO GHE 2023,Trypanosomiasis
+death_asdr_chagas_disease,cause_of_death,WHO GHE 2023,Chagas disease
+death_asdr_schistosomiasis,cause_of_death,WHO GHE 2023,Schistosomiasis
+death_asdr_leishmaniasis,cause_of_death,WHO GHE 2023,Leishmaniasis
+death_asdr_lymphatic_filariasis,cause_of_death,WHO GHE 2023,lymphatic filariasis
+death_asdr_onchocerciasis,cause_of_death,WHO GHE 2023,Onchocerciasis
+death_asdr_cysticercosis,cause_of_death,WHO GHE 2023,Cysticercosis
+death_asdr_echinococcosis,cause_of_death,WHO GHE 2023,Echinococcosis
+death_asdr_dengue,cause_of_death,WHO GHE 2023,Dengue
+death_asdr_trachoma,cause_of_death,WHO GHE 2023,Trachoma
+death_asdr_yellow_fever,cause_of_death,WHO GHE 2023,Yellow fever
+death_asdr_rabies,cause_of_death,WHO GHE 2023,Rabies
+death_asdr_intestinal_nematode_infections,cause_of_death,WHO GHE 2023,Intestinal nematode infections
+death_asdr_ascariasis,cause_of_death,WHO GHE 2023,Ascariasis
+death_asdr_trichuriasis,cause_of_death,WHO GHE 2023,Trichuriasis
+death_asdr_hookworm_disease,cause_of_death,WHO GHE 2023,Hookworm disease
+death_asdr_food_borne_trematodes,cause_of_death,WHO GHE 2023,Food-borne trematodes
+death_asdr_leprosy,cause_of_death,WHO GHE 2023,Leprosy
+death_asdr_other_infectious_diseases,cause_of_death,WHO GHE 2023,Other infectious diseases
+death_asdr_respiratory_infectious,cause_of_death,WHO GHE 2023,Respiratory Infectious
+death_asdr_lower_respiratory_infections,cause_of_death,WHO GHE 2023,Lower respiratory infections
+death_asdr_covid_19,cause_of_death,WHO GHE 2023,COVID-19
+death_asdr_upper_respiratory_infections,cause_of_death,WHO GHE 2023,Upper respiratory infections
+death_asdr_otitis_media,cause_of_death,WHO GHE 2023,Otitis media
+death_asdr_maternal_conditions,cause_of_death,WHO GHE 2023,Maternal conditions
+death_asdr_neonatal_conditions,cause_of_death,WHO GHE 2023,Neonatal conditions
+death_asdr_preterm_birth_complications,cause_of_death,WHO GHE 2023,Preterm birth complications
+death_asdr_birth_asphyxia_and_birth_trauma,cause_of_death,WHO GHE 2023,Birth asphyxia and birth trauma
+death_asdr_neonatal_sepsis_and_infections,cause_of_death,WHO GHE 2023,Neonatal sepsis and infections
+death_asdr_other_neonatal_conditions,cause_of_death,WHO GHE 2023,Other neonatal conditions
+death_asdr_nutritional_deficiencies,cause_of_death,WHO GHE 2023,Nutritional deficiencies
+death_asdr_protein_energy_malnutrition,cause_of_death,WHO GHE 2023,Protein-energy malnutrition
+death_asdr_iodine_deficiency,cause_of_death,WHO GHE 2023,Iodine deficiency
+death_asdr_vitamin_a_deficiency,cause_of_death,WHO GHE 2023,Vitamin A deficiency
+death_asdr_iron_deficiency_anaemia,cause_of_death,WHO GHE 2023,Iron-deficiency anaemia
+death_asdr_other_nutritional_deficiencies,cause_of_death,WHO GHE 2023,Other nutritional deficiencies
+death_asdr_noncommunicable_diseases,cause_of_death,WHO GHE 2023,Noncommunicable diseases
+death_asdr_malignant_neoplasms,cause_of_death,WHO GHE 2023,Malignant neoplasms
+death_asdr_mouth_and_oropharynx_cancers,cause_of_death,WHO GHE 2023,Mouth and oropharynx cancers
+death_asdr_lip_and_oral_cavity,cause_of_death,WHO GHE 2023,Lip and oral cavity
+death_asdr_nasopharynx,cause_of_death,WHO GHE 2023,Nasopharynx
+death_asdr_other_pharynx,cause_of_death,WHO GHE 2023,Other pharynx
+death_asdr_oesophagus_cancer,cause_of_death,WHO GHE 2023,Oesophagus cancer
+death_asdr_stomach_cancer,cause_of_death,WHO GHE 2023,Stomach cancer
+death_asdr_colon_and_rectum_cancers,cause_of_death,WHO GHE 2023,Colon and rectum cancers
+death_asdr_liver_cancer,cause_of_death,WHO GHE 2023,Liver cancer
+death_asdr_liver_cancer_secondary_to_hepatitis_b,cause_of_death,WHO GHE 2023,Liver cancer secondary to hepatitis B
+death_asdr_liver_cancer_secondary_to_hepatitis_c,cause_of_death,WHO GHE 2023,Liver cancer secondary to hepatitis C
+death_asdr_liver_cancer_secondary_to_alcohol_use,cause_of_death,WHO GHE 2023,Liver cancer secondary to alcohol use
+death_asdr_other_liver_cancer,cause_of_death,WHO GHE 2023,Other liver cancer
+death_asdr_pancreas_cancer,cause_of_death,WHO GHE 2023,Pancreas cancer
+death_asdr_trachea_bronchus_lung_cancers,cause_of_death,WHO GHE 2023,"Trachea, bronchus, lung cancers"
+death_asdr_melanoma_and_other_skin_cancers,cause_of_death,WHO GHE 2023,Melanoma and other skin cancers
+death_asdr_malignant_skin_melanoma,cause_of_death,WHO GHE 2023,Malignant skin melanoma
+death_asdr_non_melanoma_skin_cancer,cause_of_death,WHO GHE 2023,Non-melanoma skin cancer
+death_asdr_breast_cancer,cause_of_death,WHO GHE 2023,Breast cancer
+death_asdr_cervix_uteri_cancer,cause_of_death,WHO GHE 2023,Cervix uteri cancer
+death_asdr_corpus_uteri_cancer,cause_of_death,WHO GHE 2023,Corpus uteri cancer
+death_asdr_ovary_cancer,cause_of_death,WHO GHE 2023,Ovary cancer
+death_asdr_prostate_cancer,cause_of_death,WHO GHE 2023,Prostate cancer
+death_asdr_testicular_cancer,cause_of_death,WHO GHE 2023,Testicular cancer
+death_asdr_kidney_cancer,cause_of_death,WHO GHE 2023,Kidney cancer
+death_asdr_bladder_cancer,cause_of_death,WHO GHE 2023,Bladder cancer
+death_asdr_brain_and_nervous_system_cancers,cause_of_death,WHO GHE 2023,Brain and nervous system cancers
+death_asdr_gallbladder_and_biliary_tract_cancer,cause_of_death,WHO GHE 2023,Gallbladder and biliary tract cancer
+death_asdr_larynx_cancer,cause_of_death,WHO GHE 2023,Larynx cancer
+death_asdr_thyroid_cancer,cause_of_death,WHO GHE 2023,Thyroid cancer
+death_asdr_mesothelioma,cause_of_death,WHO GHE 2023,Mesothelioma
+death_asdr_lymphomas_multiple_myeloma,cause_of_death,WHO GHE 2023,"Lymphomas, multiple myeloma"
+death_asdr_hodgkin_lymphoma,cause_of_death,WHO GHE 2023,Hodgkin lymphoma
+death_asdr_non_hodgkin_lymphoma,cause_of_death,WHO GHE 2023,Non-Hodgkin lymphoma
+death_asdr_multiple_myeloma,cause_of_death,WHO GHE 2023,Multiple myeloma
+death_asdr_leukaemia,cause_of_death,WHO GHE 2023,Leukaemia
+death_asdr_other_malignant_neoplasms,cause_of_death,WHO GHE 2023,Other malignant neoplasms
+death_asdr_other_neoplasms,cause_of_death,WHO GHE 2023,Other neoplasms
+death_asdr_diabetes_mellitus,cause_of_death,WHO GHE 2023,Diabetes mellitus
+death_asdr_endocrine_blood_immune_disorders,cause_of_death,WHO GHE 2023,"Endocrine, blood, immune disorders"
+death_asdr_thalassaemias,cause_of_death,WHO GHE 2023,Thalassaemias
+death_asdr_sickle_cell_disorders_and_trait,cause_of_death,WHO GHE 2023,Sickle cell disorders and trait
+death_asdr_other_haemoglobinopathies_and_haemolytic_anaemias,cause_of_death,WHO GHE 2023,Other haemoglobinopathies and haemolytic anaemias
+death_asdr_other_endocrine_blood_and_immune_disorders,cause_of_death,WHO GHE 2023,"Other endocrine, blood and immune disorders"
+death_asdr_mental_and_substance_use_disorders,cause_of_death,WHO GHE 2023,Mental and substance use disorders
+death_asdr_depressive_disorders,cause_of_death,WHO GHE 2023,Depressive disorders
+death_asdr_bipolar_disorder,cause_of_death,WHO GHE 2023,Bipolar disorder
+death_asdr_schizophrenia,cause_of_death,WHO GHE 2023,Schizophrenia
+death_asdr_alcohol_use_disorders,cause_of_death,WHO GHE 2023,Alcohol use disorders
+death_asdr_drug_use_disorders,cause_of_death,WHO GHE 2023,Drug use disorders
+death_asdr_opioid_use_disorders,cause_of_death,WHO GHE 2023,Opioid use disorders
+death_asdr_cocaine_use_disorders,cause_of_death,WHO GHE 2023,Cocaine use disorders
+death_asdr_amphetamine_use_disorders,cause_of_death,WHO GHE 2023,Amphetamine use disorders
+death_asdr_cannabis_use_disorders,cause_of_death,WHO GHE 2023,Cannabis use disorders
+death_asdr_other_drug_use_disorders,cause_of_death,WHO GHE 2023,Other drug use disorders
+death_asdr_anxiety_disorders,cause_of_death,WHO GHE 2023,Anxiety disorders
+death_asdr_eating_disorders,cause_of_death,WHO GHE 2023,Eating disorders
+death_asdr_austism_and_asperger_syndrome,cause_of_death,WHO GHE 2023,Austism and Asperger syndrome
+death_asdr_childhood_behavioural_disorders,cause_of_death,WHO GHE 2023,Childhood behavioural disorders
+death_asdr_attention_deficit_hyperactivity_syndrome,cause_of_death,WHO GHE 2023,Attention deficit/hyperactivity syndrome
+death_asdr_conduct_disorder,cause_of_death,WHO GHE 2023,Conduct disorder
+death_asdr_idiopathic_intellectual_disability,cause_of_death,WHO GHE 2023,Idiopathic intellectual disability
+death_asdr_other_mental_and_behavioural_disorders,cause_of_death,WHO GHE 2023,Other mental and behavioural disorders
+death_asdr_neurological_conditions,cause_of_death,WHO GHE 2023,Neurological conditions
+death_asdr_alzheimer_disease_and_other_dementias,cause_of_death,WHO GHE 2023,Alzheimer disease and other dementias
+death_asdr_parkinson_disease,cause_of_death,WHO GHE 2023,Parkinson disease
+death_asdr_epilepsy,cause_of_death,WHO GHE 2023,Epilepsy
+death_asdr_multiple_sclerosis,cause_of_death,WHO GHE 2023,Multiple sclerosis
+death_asdr_migraine,cause_of_death,WHO GHE 2023,Migraine
+death_asdr_non_migrane_headache,cause_of_death,WHO GHE 2023,Non-migrane headache
+death_asdr_other_neurological_conditions,cause_of_death,WHO GHE 2023,Other neurological conditions
+death_asdr_sense_organ_diseases,cause_of_death,WHO GHE 2023,Sense organ diseases
+death_asdr_glaucoma,cause_of_death,WHO GHE 2023,Glaucoma
+death_asdr_cataracts,cause_of_death,WHO GHE 2023,Cataracts
+death_asdr_uncorrected_refractive_errors,cause_of_death,WHO GHE 2023,Uncorrected refractive errors
+death_asdr_macular_degeneration,cause_of_death,WHO GHE 2023,Macular degeneration
+death_asdr_other_vision_loss,cause_of_death,WHO GHE 2023,Other vision loss
+death_asdr_other_hearing_loss,cause_of_death,WHO GHE 2023,Other hearing loss
+death_asdr_other_sense_organ_disorders,cause_of_death,WHO GHE 2023,Other sense organ disorders
+death_asdr_cardiovascular_diseases,cause_of_death,WHO GHE 2023,Cardiovascular diseases
+death_asdr_rheumatic_heart_disease,cause_of_death,WHO GHE 2023,Rheumatic heart disease
+death_asdr_hypertensive_heart_disease,cause_of_death,WHO GHE 2023,Hypertensive heart disease
+death_asdr_ischaemic_heart_disease,cause_of_death,WHO GHE 2023,Ischaemic heart disease
+death_asdr_stroke,cause_of_death,WHO GHE 2023,Stroke
+death_asdr_ischaemic_stroke,cause_of_death,WHO GHE 2023,Ischaemic stroke
+death_asdr_haemorrhagic_stroke,cause_of_death,WHO GHE 2023,Haemorrhagic stroke
+death_asdr_cardiomyopathy_myocarditis_endocarditis,cause_of_death,WHO GHE 2023,"Cardiomyopathy, myocarditis, endocarditis"
+death_asdr_other_circulatory_diseases,cause_of_death,WHO GHE 2023,Other circulatory diseases
+death_asdr_respiratory_diseases,cause_of_death,WHO GHE 2023,Respiratory diseases
+death_asdr_chronic_obstructive_pulmonary_disease,cause_of_death,WHO GHE 2023,Chronic obstructive pulmonary disease
+death_asdr_asthma,cause_of_death,WHO GHE 2023,Asthma
+death_asdr_other_respiratory_diseases,cause_of_death,WHO GHE 2023,Other respiratory diseases
+death_asdr_digestive_diseases,cause_of_death,WHO GHE 2023,Digestive diseases
+death_asdr_peptic_ulcer_disease,cause_of_death,WHO GHE 2023,Peptic ulcer disease
+death_asdr_cirrhosis_of_the_liver,cause_of_death,WHO GHE 2023,Cirrhosis of the liver
+death_asdr_cirrhosis_due_to_hepatitis_b,cause_of_death,WHO GHE 2023,Cirrhosis due to hepatitis B
+death_asdr_cirrhosis_due_to_hepatitis_c,cause_of_death,WHO GHE 2023,Cirrhosis due to hepatitis C
+death_asdr_cirrhosis_due_to_alcohol_use,cause_of_death,WHO GHE 2023,Cirrhosis due to alcohol use
+death_asdr_other_liver_cirrhosis,cause_of_death,WHO GHE 2023,Other liver cirrhosis
+death_asdr_appendicitis,cause_of_death,WHO GHE 2023,Appendicitis
+death_asdr_gastritis_and_duodenitis,cause_of_death,WHO GHE 2023,Gastritis and duodenitis
+death_asdr_paralytic_ileus_and_intestinal_obstruction,cause_of_death,WHO GHE 2023,Paralytic ileus and intestinal obstruction
+death_asdr_inflammatory_bowel_disease,cause_of_death,WHO GHE 2023,Inflammatory bowel disease
+death_asdr_gallbladder_and_biliary_diseases,cause_of_death,WHO GHE 2023,Gallbladder and biliary diseases
+death_asdr_pancreatitis,cause_of_death,WHO GHE 2023,Pancreatitis
+death_asdr_other_digestive_diseases,cause_of_death,WHO GHE 2023,Other digestive diseases
+death_asdr_genitourinary_diseases,cause_of_death,WHO GHE 2023,Genitourinary diseases
+death_asdr_kidney_diseases,cause_of_death,WHO GHE 2023,Kidney diseases
+death_asdr_acute_glomerulonephritis,cause_of_death,WHO GHE 2023,Acute glomerulonephritis
+death_asdr_chronic_kidney_disease_due_to_diabetes,cause_of_death,WHO GHE 2023,Chronic kidney disease due to diabetes
+death_asdr_other_chronic_kidney_disease,cause_of_death,WHO GHE 2023,Other chronic kidney disease
+death_asdr_benign_prostatic_hyperplasia,cause_of_death,WHO GHE 2023,Benign prostatic hyperplasia
+death_asdr_urolithiasis,cause_of_death,WHO GHE 2023,Urolithiasis
+death_asdr_other_urinary_diseases,cause_of_death,WHO GHE 2023,Other urinary diseases
+death_asdr_infertility,cause_of_death,WHO GHE 2023,Infertility
+death_asdr_gynecological_diseases,cause_of_death,WHO GHE 2023,Gynecological diseases
+death_asdr_skin_diseases,cause_of_death,WHO GHE 2023,Skin diseases
+death_asdr_musculoskeletal_diseases,cause_of_death,WHO GHE 2023,Musculoskeletal diseases
+death_asdr_rheumatoid_arthritis,cause_of_death,WHO GHE 2023,Rheumatoid arthritis
+death_asdr_osteoarthritis,cause_of_death,WHO GHE 2023,Osteoarthritis
+death_asdr_gout,cause_of_death,WHO GHE 2023,Gout
+death_asdr_back_and_neck_pain,cause_of_death,WHO GHE 2023,Back and neck pain
+death_asdr_other_musculoskeletal_disorders,cause_of_death,WHO GHE 2023,Other musculoskeletal disorders
+death_asdr_congenital_anomalies,cause_of_death,WHO GHE 2023,Congenital anomalies
+death_asdr_neural_tube_defects,cause_of_death,WHO GHE 2023,Neural tube defects
+death_asdr_cleft_lip_and_cleft_palate,cause_of_death,WHO GHE 2023,Cleft lip and cleft palate
+death_asdr_down_syndrome,cause_of_death,WHO GHE 2023,Down syndrome
+death_asdr_congenital_heart_anomalies,cause_of_death,WHO GHE 2023,Congenital heart anomalies
+death_asdr_other_chromosomal_anomalies,cause_of_death,WHO GHE 2023,Other chromosomal anomalies
+death_asdr_other_congenital_anomalies,cause_of_death,WHO GHE 2023,Other congenital anomalies
+death_asdr_oral_conditions,cause_of_death,WHO GHE 2023,Oral conditions
+death_asdr_dental_caries,cause_of_death,WHO GHE 2023,Dental caries
+death_asdr_periodontal_disease,cause_of_death,WHO GHE 2023,Periodontal disease
+death_asdr_edentulism,cause_of_death,WHO GHE 2023,Edentulism
+death_asdr_other_oral_disorders,cause_of_death,WHO GHE 2023,Other oral disorders
+death_asdr_sudden_infant_death_syndrome,cause_of_death,WHO GHE 2023,Sudden infant death syndrome
+death_asdr_injuries,cause_of_death,WHO GHE 2023,Injuries
+death_asdr_unintentional_injuries,cause_of_death,WHO GHE 2023,Unintentional injuries
+death_asdr_road_injury,cause_of_death,WHO GHE 2023,Road injury
+death_asdr_poisonings,cause_of_death,WHO GHE 2023,Poisonings
+death_asdr_falls,cause_of_death,WHO GHE 2023,Falls
+death_asdr_fire_heat_and_hot_substances,cause_of_death,WHO GHE 2023,"Fire, heat and hot substances"
+death_asdr_drowning,cause_of_death,WHO GHE 2023,Drowning
+death_asdr_exposure_to_mechanical_forces,cause_of_death,WHO GHE 2023,Exposure to mechanical forces
+death_asdr_natural_disasters,cause_of_death,WHO GHE 2023,Natural disasters
+death_asdr_other_unintentional_injuries,cause_of_death,WHO GHE 2023,Other unintentional injuries
+death_asdr_intentional_injuries,cause_of_death,WHO GHE 2023,Intentional injuries
+death_asdr_self_harm,cause_of_death,WHO GHE 2023,Self-harm
+death_asdr_interpersonal_violence,cause_of_death,WHO GHE 2023,Interpersonal violence
+death_asdr_collective_violence_and_legal_intervention,cause_of_death,WHO GHE 2023,Collective violence and legal intervention
