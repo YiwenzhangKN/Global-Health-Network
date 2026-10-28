@@ -256,6 +256,9 @@ def pick_total_rows(records):
                 return SEX_LABELS.get(str(r.get(f"Dim{i}")).lower()) == "both"
         return True
 
+    # Select observations at the country-year level to avoid
+    # discarding valid records when breakdown availability
+    # differs across countries or reporting years.
     records = [r for r in records if is_both(r)]
     plain = [r for r in records if not other_dims(r)]
     if plain:
@@ -428,10 +431,23 @@ def main():
     causes = causes.copy()
     causes["column"] = "death_" + causes["measure"] + "_" + causes["cause"].map(slug)
     causes.loc[causes["sex"] != "both", "column"] += "_" + causes["sex"]
+    
+    # Check whether different causes map to the same column name.
+    cause_mapping = causes.groupby("column")["cause"].nunique()
+    conflicts = cause_mapping[cause_mapping > 1]
+
+    if not conflicts.empty:
+        raise ValueError(
+            f"Different causes share the same column name: "
+            f"{conflicts.index.tolist()}"
+        )
+    
     dupes = causes.duplicated(["iso3", "year", "column"]).sum()
     if dupes:
         print(f"  warning: {dupes} cause values share a column name and were averaged")
-    wide_causes = causes.pivot_table(index=["iso3", "year"], columns="column", values="value",
+    wide_causes = causes.pivot_table(index=["iso3", "year"], 
+                                     columns="column", 
+                                     values="value",
                                      aggfunc="mean").reset_index()
 
     # --- merge everything -----------------------------------------------------
