@@ -16,11 +16,11 @@ OUT_DIR = Path("./../data/network")
 
 CONTROL = "gdp_pc_ppp"  # wealth effect removed from every cause before correlating
 
-# How causes are linked:
+# How causes are linked (both networks are built and exported, the viewer switches between them):
 #   "glasso"      = direct links: partial correlation between two causes given ALL other causes
 #                   (graphical lasso). Removes links that only exist through a shared pattern.
 #   "correlation" = co-occurrence: plain correlation between two causes (GDP removed only)
-METHOD = "glasso"
+METHODS = ["glasso", "correlation"]
 THRESHOLD = {"glasso": 0.05, "correlation": 0.35}  # minimum link strength for a cause-cause edge
                                                    # (0.35 = significant after Bonferroni, n = 182)
 SEED = 42               # makes the community detection reproducible
@@ -158,12 +158,13 @@ def direct_links(residuals, alpha=None):
     return pd.DataFrame(pcorr, index=residuals.columns, columns=residuals.columns), (alpha or model.alpha_)
 
 
-def cause_links(data, causes, alpha=None):
-    """Link strength between all causes with the method set in METHOD.
+def cause_links(data, causes, method, alpha=None):
+    """Link strength between all causes.
 
     Parameters
     data: pandas.DataFrame, cleaned dataset (or a resampled version of it)
     causes: list of str, cause columns
+    method: str, "glasso" or "correlation"
     alpha: float or None, graphical lasso penalty (None = cross-validation; ignored for "correlation")
 
     Returns
@@ -171,7 +172,7 @@ def cause_links(data, causes, alpha=None):
     float or None, the alpha that was used
     """
     residuals = remove_control(data[causes], data[CONTROL])
-    if METHOD == "correlation":
+    if method == "correlation":
         return residuals.corr(), None
     return direct_links(residuals, alpha)
 
@@ -231,12 +232,13 @@ def add_communities(G):
     return nx.community.modularity(G, communities, weight="weight")
 
 
-def bootstrap_partition(data, causes, alpha, i):
+def bootstrap_partition(data, causes, method, alpha, i):
     """Communities of one resampled network (one bootstrap run).
 
     Parameters
     data: pandas.DataFrame, cleaned dataset
     causes: list of str, cause columns
+    method: str, "glasso" or "correlation"
     alpha: float or None, graphical lasso penalty of the original network (kept fixed for speed)
     i: int, number of the run (used as random seed)
 
@@ -249,14 +251,14 @@ def bootstrap_partition(data, causes, alpha, i):
         with warnings.catch_warnings():
             # some resampled datasets converge slowly or contain a constant column; the estimate is still usable
             warnings.simplefilter("ignore")
-            corr, _ = cause_links(sample, causes, alpha)
+            corr, _ = cause_links(sample, causes, method, alpha)
     except FloatingPointError:   # rare: the resampled data is too ill-conditioned for the graphical lasso
         return None
-    partition, _ = find_communities(build_network(corr, THRESHOLD[METHOD]), seed=i)
+    partition, _ = find_communities(build_network(corr, THRESHOLD[method]), seed=i)
     return np.array([partition[c] for c in causes])
 
 
-def stability(data, causes, G, alpha):
+def stability(data, causes, G, method, alpha):
     """Bootstrap stability of the communities.
 
     The countries are resampled with replacement N_BOOTSTRAP times. For every sample the network and
@@ -268,6 +270,7 @@ def stability(data, causes, G, alpha):
     data: pandas.DataFrame, cleaned dataset (one row per country)
     causes: list of str, cause columns (network nodes)
     G: networkx.Graph, original network with node attribute "community"
+    method: str, "glasso" or "correlation"
     alpha: float or None, graphical lasso penalty of the original network
 
     Returns
@@ -276,7 +279,7 @@ def stability(data, causes, G, alpha):
     list of float, adjusted Rand index of every sample vs. the original communities (1 = identical)
     """
     original = np.array([G.nodes[c]["community"] for c in causes])
-    runs = Parallel(n_jobs=-1)(delayed(bootstrap_partition)(data, causes, alpha, i) for i in range(N_BOOTSTRAP))
+    runs = Parallel(n_jobs=-1)(delayed(bootstrap_partition)(data, causes, method, alpha, i) for i in range(N_BOOTSTRAP))
     runs = [labels for labels in runs if labels is not None]
 
     together = np.zeros((len(causes), len(causes)))
@@ -367,11 +370,13 @@ def check_expected_links(corr):
     return pd.DataFrame(rows)
 
 
-def export(G):
-    """Save the network as nodes.csv, edges.csv, network.json (for an HTML/D3 page) and network.gexf (Gephi).
+def export(G, method):
+    """Save the network as nodes_<method>.csv, edges_<method>.csv, network_<method>.json (for the HTML viewer)
+    and network_<method>.gexf (Gephi).
 
     Parameters
     G: networkx.Graph
+    method: str, "glasso" or "correlation" (added to the file names)
 
     Returns
     None
@@ -382,18 +387,18 @@ def export(G):
     edges = pd.DataFrame([{"source": a, "target": b, "weight": d["weight"], "rho": d.get("rho", d["weight"]),
                            "type": "indicator-cause" if "sign" in d else "cause-cause"}
                           for a, b, d in G.edges(data=True)])
-    nodes.sort_values(["community", "degree"], ascending=[True, False]).to_csv(OUT_DIR / "nodes.csv", index=False)
-    edges.to_csv(OUT_DIR / "edges.csv", index=False)
+    nodes.sort_values(["community", "degree"], ascending=[True, False]).to_csv(OUT_DIR / f"nodes_{method}.csv", index=False)
+    edges.to_csv(OUT_DIR / f"edges_{method}.csv", index=False)
 
     # {"nodes": [...], "links": [...]} is the format D3.js force layouts read directly
     network = {
-        "meta": {"method": METHOD, "control": CONTROL, "threshold": THRESHOLD[METHOD],
+        "meta": {"method": method, "control": CONTROL, "threshold": THRESHOLD[method],
                  "indicator_threshold": INDICATOR_THRESHOLD,
                  "nodes": G.number_of_nodes(), "edges": G.number_of_edges()},
         "nodes": nodes.to_dict(orient="records"),
         "links": edges.to_dict(orient="records"),
     }
-    with open(OUT_DIR / "network.json", "w", encoding="utf-8") as f:
+    with open(OUT_DIR / f"network_{method}.json", "w", encoding="utf-8") as f:
         json.dump(network, f, indent=1)
 
     G_gexf = G.copy()
@@ -403,45 +408,53 @@ def export(G):
     for a, b in G_gexf.edges:
         G_gexf.edges[a, b].setdefault("rho", G_gexf.edges[a, b]["weight"])
         G_gexf.edges[a, b].setdefault("sign", 1)
-    nx.write_gexf(G_gexf, OUT_DIR / "network.gexf")
+    nx.write_gexf(G_gexf, OUT_DIR / f"network_{method}.gexf")
 
 
-def export_coassignment(together):
+def export_coassignment(together, method):
     """Save the co-assignment matrix (for a heatmap in the report).
 
     Parameters
     together: pandas.DataFrame, output of stability()
+    method: str, "glasso" or "correlation" (added to the file name)
 
     Returns
     None
     """
-    together.rename(index=label, columns=label).round(3).to_csv(OUT_DIR / "coassignment.csv")
+    together.rename(index=label, columns=label).round(3).to_csv(OUT_DIR / f"coassignment_{method}.csv")
 
 
-def main():
-    """Build the disease network from clean_2019.csv and export it."""
-    data = pd.read_csv(DATA_FILE)
-    dictionary = pd.read_csv(DICTIONARY_FILE)
+def build(data, dictionary, method):
+    """Build one disease network (causes + health-system layer), export it and print a summary.
+
+    Parameters
+    data: pandas.DataFrame, cleaned dataset
+    dictionary: pandas.DataFrame, dictionary.csv
+    method: str, "glasso" or "correlation"
+
+    Returns
+    None
+    """
     causes = [c for c in data.columns if c.startswith("death_asdr_")]
 
-    # 1) link strength between causes after removing the wealth effect (METHOD: glasso or correlation)
-    corr, alpha = cause_links(data, causes)
+    # 1) link strength between causes after removing the wealth effect
+    corr, alpha = cause_links(data, causes, method)
 
     # 2) network: causes = nodes, strong positive links = edges
-    G = build_network(corr, THRESHOLD[METHOD])
+    G = build_network(corr, THRESHOLD[method])
 
     # 3) communities and node information
     modularity = add_communities(G)
     add_node_info(G, data, cause_categories(dictionary))
 
     # 4) stability: how often does each cause stay in its community when the countries are resampled?
-    print(f"Method: {METHOD}" + (f" (graphical lasso, alpha = {alpha:.3f})" if alpha else ""))
+    print(f"\n===== Method: {method}" + (f" (graphical lasso, alpha = {alpha:.3f})" if alpha else "") + " =====")
     print(f"Stability check: {N_BOOTSTRAP} resampled networks on all CPU cores ...")
-    scores, together, agreement = stability(data, causes, G, alpha)
+    scores, together, agreement = stability(data, causes, G, method, alpha)
     for node in G.nodes:
         G.nodes[node]["stability"] = 0.0 if np.isnan(scores[node]) else round(float(scores[node]), 3)  # isolated causes: 0
 
-    # 5) health-system layer: indicators linked to causes (GDP removed as well)
+    # 5) health-system layer: indicators linked to causes (GDP removed as well, same for both methods)
     indicators = [c for c in data.columns if c not in ["iso3", "country", "region", "income_group", CONTROL]
                   and c not in causes and c not in NOT_IN_NETWORK]
     corr_all = remove_control(data[causes + indicators], data[CONTROL]).corr()
@@ -449,12 +462,10 @@ def main():
     groups["battle_deaths_per100k"] = "context"
     disease_edges = G.number_of_edges()
     add_indicators(G, corr_all, indicators, groups)
-    expected = check_expected_links(corr_all)
 
     # 6) export
-    export(G)
-    export_coassignment(together)
-    expected.to_csv(OUT_DIR / "expected_links.csv", index=False)
+    export(G, method)
+    export_coassignment(together, method)
 
     # summary
     cause_nodes = [n for n in G if G.nodes[n]["type"] == "cause"]
@@ -469,12 +480,28 @@ def main():
     print(f"Agreement with the original communities (mean adjusted Rand index over {len(agreement)} runs): {np.mean(agreement):.2f}")
     print("Stability per community (share of samples members stay together):", community_stability.round(2).to_dict())
     linked = [i for i in indicators if G.degree(i) > 0]
-    print(f"\nHealth-system layer: {len(indicators)} indicators, {len(linked)} with links, "
+    print(f"Health-system layer: {len(indicators)} indicators, {len(linked)} with links, "
           f"{G.number_of_edges() - disease_edges} indicator-cause edges")
-    print(f"Expected links found: {expected['found'].sum()} of {len(expected)} "
+
+
+def main():
+    """Build both disease networks from clean_2019.csv, export them and check the expected indicator links."""
+    data = pd.read_csv(DATA_FILE)
+    dictionary = pd.read_csv(DICTIONARY_FILE)
+    for method in METHODS:
+        build(data, dictionary, method)
+
+    # expected health-system links (the indicator layer is the same in both networks)
+    causes = [c for c in data.columns if c.startswith("death_asdr_")]
+    indicators = [c for c in data.columns if c not in ["iso3", "country", "region", "income_group", CONTROL]
+                  and c not in causes and c not in NOT_IN_NETWORK]
+    expected = check_expected_links(remove_control(data[causes + indicators], data[CONTROL]).corr())
+    expected.to_csv(OUT_DIR / "expected_links.csv", index=False)
+    print(f"\nExpected links found: {expected['found'].sum()} of {len(expected)} "
           f"(right direction: {expected['right_direction'].sum()} of {len(expected)})")
     print(expected.to_string(index=False))
-    print(f"\nWritten to {OUT_DIR}: nodes.csv, edges.csv, network.json, network.gexf, coassignment.csv, expected_links.csv")
+    print(f"\nWritten to {OUT_DIR}: nodes_*.csv, edges_*.csv, network_*.json, network_*.gexf, coassignment_*.csv, "
+          f"expected_links.csv  (* = {', '.join(METHODS)})")
 
 
 if __name__ == "__main__":

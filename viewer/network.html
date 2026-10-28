@@ -43,6 +43,14 @@
   .controls button { background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
                      border-radius: 6px; padding: 5px 10px; font: inherit; font-size: 13px; cursor: pointer; }
 
+  .switch { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .switch button { border: none; border-radius: 0; background: var(--surface); color: var(--text-2);
+                   padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+  .switch button + button { border-left: 1px solid var(--border); }
+  .switch button.on { background: var(--text); color: var(--surface); font-weight: 600; }
+  .switch button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .method-note { margin: 8px 0 0; color: var(--text-2); max-width: 900px; font-size: 13px; }
+
   .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 10px 24px; font-size: 13px; }
   .legend-item { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;
                  padding: 2px 6px; border-radius: 6px; border: 1px solid transparent; }
@@ -97,9 +105,14 @@
 <body>
 <header>
   <h1>Global disease network (2019)</h1>
-  <p class="sub">Causes of death are linked if they are high in the same countries – directly, not only through a shared pattern with other causes – after removing the effect of national wealth (GDP per capita).
+  <p class="sub">Causes of death are linked if they are high in the same countries, after removing the effect of national wealth (GDP per capita).
      Health-system and risk-factor indicators are linked to the causes they are associated with.
      Hover a node for details, click it to list its links, drag to move, scroll to zoom.</p>
+  <div style="margin-top:12px" class="switch" role="group" aria-label="Network">
+    <button data-method="correlation">Co-occurrence</button>
+    <button data-method="glasso">Direct links</button>
+  </div>
+  <p class="method-note" id="method-note"></p>
   <div class="stats" id="stats"></div>
 </header>
 
@@ -142,10 +155,10 @@
 </div>
 
 <div id="loader" hidden>
-  <p><b>network.json could not be loaded automatically.</b> Browsers block reading local files when an HTML file is opened directly.
-     Either select the file here, or start a local server in this folder (<code>python -m http.server</code>) and open
-     <code>http://localhost:8000/network.html</code>.</p>
-  <input type="file" id="file-input" accept=".json,application/json">
+  <p><b>The network files could not be loaded automatically.</b> Browsers block reading local files when an HTML file is opened directly.
+     Either select <code>network_glasso.json</code> and <code>network_correlation.json</code> here (both at once), or start the
+     viewer server (<code>npm start</code>) and open <code>http://localhost:3000</code>.</p>
+  <input type="file" id="file-input" accept=".json,application/json" multiple>
 </div>
 
 <details class="table-view">
@@ -158,10 +171,24 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>
 // Config +++
-const DATA_FILE = "network.json";   // exported by network_builder.py
+const DATA_FILES = {                      // exported by network_builder.py
+  correlation: "network_correlation.json",
+  glasso: "network_glasso.json",
+};
+const DEFAULT_METHOD = "correlation";     // network shown first
 
-// Names of the communities (they come from the interpretation, change them if the network changes)
+// Names of the communities per network (they come from the interpretation, change them if the network changes)
 const COMMUNITY_NAMES = {
+ correlation: {
+  0: "Isolated causes / unlinked indicators",
+  1: "Vaccine-preventable & basic care",
+  2: "Tropical & poverty-related",
+  3: "Cancers",
+  4: "Low-mortality causes (WHO estimates)",
+  5: "Alcohol-related",
+  6: "Liver cancers",
+ },
+ glasso: {
   0: "Isolated causes / unlinked indicators",
   1: "Cancers",
   2: "Low-mortality causes & acute hepatitis",
@@ -174,6 +201,17 @@ const COMMUNITY_NAMES = {
   9: "Vaccine-preventable, TB & hepatitis B",
   10: "HIV, cervical cancer & violence",
   11: "Drug use & head-and-neck cancers",
+ },
+};
+
+// What each network shows (text under the switch)
+const METHOD_NOTE = {
+  correlation: "Co-occurrence: two causes are linked if they are high in the same countries (|ρ| ≥ 0.35). " +
+               "Shows the broad patterns – which diseases go together because they share a setting, such as weak basic care or a region. " +
+               "Some links only exist through such a shared setting.",
+  glasso: "Direct links: two causes are linked only if they are related beyond what all other causes explain (graphical lasso). " +
+          "Shows how specific diseases are tied to each other – sparser, but shared-setting links such as HIV–drowning disappear. " +
+          "Weak links (below about 0.10) are less reliable.",
 };
 
 // How the cause-cause links were computed (network_builder.py, METHOD)
@@ -193,29 +231,53 @@ const dark = () => document.documentElement.dataset.theme === "dark" ||
   (document.documentElement.dataset.theme !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 const palette = () => (dark() ? COLORS_DARK : COLORS_LIGHT);
 const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-const communityName = c => COMMUNITY_NAMES[c] || `Community ${c}`;
+let method = DEFAULT_METHOD;               // network currently shown
+const networks = {};                      // method -> loaded network.json content
+let currentUpdate = () => {};             // redraw function of the current network
+let selectedId = null;                    // clicked node, kept when switching networks
+const communityName = c => (COMMUNITY_NAMES[method] || {})[c] || `Community ${c}`;
 const fmt = (v, d = 2) => (v === null || v === undefined || Number.isNaN(+v)) ? "–" : (+v).toFixed(d);
 
 // ---------------------------------------------------------------------------------------------
-// Loading: fetch network.json; if that is blocked (file://), show a file picker instead
+// Loading: fetch both networks; if that is blocked (file://), show a file picker instead
 // ---------------------------------------------------------------------------------------------
-fetch(DATA_FILE)
-  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-  .then(draw)
-  .catch(() => {
+Promise.all(Object.entries(DATA_FILES).map(([m, file]) =>
+  fetch(file).then(r => r.ok ? r.json() : null).catch(() => null).then(data => { if (data) networks[m] = data; })))
+  .then(start);
+
+function start() {
+  if (!Object.keys(networks).length) {
     document.getElementById("loader").hidden = false;
     document.getElementById("layout").hidden = true;
-  });
+    return;
+  }
+  document.getElementById("loader").hidden = true;
+  document.getElementById("layout").hidden = false;
+  if (!networks[method]) method = Object.keys(networks)[0];
+  showNetwork(method);
+}
 
 document.getElementById("file-input").addEventListener("change", e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  file.text().then(text => {
-    document.getElementById("loader").hidden = true;
-    document.getElementById("layout").hidden = false;
-    draw(JSON.parse(text));
-  });
+  Promise.all([...e.target.files].map(file => file.text().then(text => {
+    const data = JSON.parse(text);
+    networks[data.meta.method] = data;
+  }))).then(start);
 });
+
+// switch between the two networks
+function showNetwork(m) {
+  method = m;
+  document.querySelectorAll(".switch button").forEach(b => {
+    b.classList.toggle("on", b.dataset.method === m);
+    b.disabled = !networks[b.dataset.method];
+    b.setAttribute("aria-pressed", b.dataset.method === m);
+  });
+  document.getElementById("method-note").textContent = METHOD_NOTE[m] || "";
+  draw(networks[m]);
+}
+document.querySelectorAll(".switch button").forEach(b =>
+  b.addEventListener("click", () => { if (networks[b.dataset.method] && b.dataset.method !== method) showNetwork(b.dataset.method); }));
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => currentUpdate());
 
 // ---------------------------------------------------------------------------------------------
 // Drawing
@@ -236,7 +298,7 @@ function draw(data) {
   const causes = nodes.filter(d => d.type === "cause");
   const communities = [...new Set(nodes.map(d => d.community))].sort((a, b) => a - b);
   const active = new Set(communities);           // communities currently shown
-  let selected = null;                           // clicked node
+  let selected = null;                           // clicked node (set again at the end if it exists in this network)
 
   document.getElementById("stats").textContent =
     `${causes.length} causes of death · ${nodes.length - causes.length} indicators · ` +
@@ -277,6 +339,7 @@ function draw(data) {
 
   // ---- layout: communities placed around a circle, nodes pulled towards their community ------
   const chart = document.getElementById("chart");
+  chart.innerHTML = "";                                                     // remove the previous network
   const width = chart.clientWidth, height = chart.clientHeight;
   const ringRadius = Math.min(width, height) * 0.30;
   const centers = new Map();
@@ -412,6 +475,7 @@ function draw(data) {
   // ---- details panel ----------------------------------------------------------------------------
   function select(d) {
     selected = d;
+    selectedId = d ? d.id : null;
     highlight(d);
     const panel = document.getElementById("details");
     if (!d) { panel.innerHTML = `<p class="hint">Click a node to see its links.</p>`; return; }
@@ -438,6 +502,7 @@ function draw(data) {
     legend.innerHTML = "";
     communities.forEach(c => {
       const count = nodes.filter(d => d.community === c && (d.type === "cause" || document.getElementById("show-indicators").checked)).length;
+      if (!count) return;   // nothing to show (e.g. only unlinked indicators while indicators are hidden)
       const item = document.createElement("div");
       item.className = "legend-item" + (active.has(c) ? "" : " off");
       const color = mode === "community" ? (c > 0 ? palette()[(c - 1) % palette().length] : css("--neutral-node")) : "transparent";
@@ -473,7 +538,7 @@ function draw(data) {
 
   // ---- search ------------------------------------------------------------------------------------
   document.getElementById("node-list").innerHTML = nodes.map(d => `<option value="${d.label}">`).join("");
-  document.getElementById("search").addEventListener("change", e => {
+  document.getElementById("search").onchange = e => {
     const d = nodes.find(n => n.label.toLowerCase() === e.target.value.trim().toLowerCase());
     if (!d) return;
     active.add(d.community);
@@ -482,16 +547,17 @@ function draw(data) {
     select(d);
     svg.transition().duration(600).call(zoom.transform,
       d3.zoomIdentity.translate(width / 2, height / 2).scale(2.2).translate(-d.x, -d.y));
-  });
+  };
 
   // ---- controls ----------------------------------------------------------------------------------
+  // on-properties (not addEventListener): switching networks replaces the handlers instead of adding more
   ["color-by", "show-indicators", "link-sign", "fade-unstable", "show-labels"].forEach(id =>
-    document.getElementById(id).addEventListener("change", update));
-  document.getElementById("min-weight").addEventListener("input", e => {
+    document.getElementById(id).onchange = update);
+  document.getElementById("min-weight").oninput = e => {
     document.getElementById("min-weight-value").textContent = (+e.target.value).toFixed(2);
     update();
-  });
-  document.getElementById("reset").addEventListener("click", () => {
+  };
+  document.getElementById("reset").onclick = () => {
     communities.forEach(c => active.add(c));
     document.getElementById("color-by").value = "community";
     document.getElementById("show-indicators").checked = false;
@@ -504,11 +570,13 @@ function draw(data) {
     select(null);
     update();
     fitView(500);
-  });
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", update);
+  };
 
+  currentUpdate = update;
   update();
   fitView();
+  if (selectedId && byId.has(selectedId)) select(byId.get(selectedId));   // keep the clicked node when switching
+  else select(null);
 }
 </script>
 </body>
