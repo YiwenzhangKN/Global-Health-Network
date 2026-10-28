@@ -3,11 +3,11 @@ import re
 from pathlib import Path
 import pandas as pd
 
-# Config +++
+# Settings
 RAW_DIR = Path("./../data/raw")
 OUT_DIR = Path("./../data/preprocessed")
 
-start_year, last_year = 2000, 2023 #Starting Year and End Year of Data
+start_year, last_year = 2000, 2023 # Source year range.
 ONLY_COUNTRIES_WITH_CAUSE_DATA = True
 
 CAUSE_MEASURES = ["asdr"]
@@ -15,7 +15,7 @@ CAUSE_SEXES = ["both"]
 
 GHE_FILES = {"asdr": "ghe2023_asdr_bycountry.xlsx", "crude": "ghe2023_crude_bycountry.xlsx"}
 
-# Mapped Data
+# Source mappings.
 WORLDBANK = {
     "SH.XPD.CHEX.GD.ZS": ("health_exp_pct_gdp", "system_input"),
     "SH.XPD.CHEX.PP.CD": ("health_exp_pc_ppp", "system_input"),
@@ -43,9 +43,9 @@ WORLDBANK = {
     "VC.BTL.DETH": ("battle_deaths", "context"),
     "GOV_WGI_GE_SC": ("government_effectiveness", "context"),
     "SP.REG.DTHS.ZS": ("death_registration_completeness", "data_quality"),
-} # Indicators Worldbank Dataset
+} # World Bank indicators.
 
-#WHO
+# WHO indicators.
 WHO_GHO = {
     "WHOSIS_000001": ("life_expectancy", "outcome"),
     "WHOSIS_000002": ("hale", "outcome"),
@@ -108,13 +108,13 @@ WHO_GHO = {
     "SA_0000001688": ("alcohol_per_capita", "risk_factor"),
 }
 
-#OWID
+# OWID indicators.
 OWID = {"human-development-index": ("hdi", "context")}
 
-# Breakdown values that mean "everyone" (used when WHO gives no plain total).
+# WHO total breakdown markers.
 TOTAL_MARKERS = ["18-PLUS", "15-PLUS", "18PLUS", "15PLUS", "GHE000000", "TOTL", "TOTAL", "ALLAGES"]
 
-# Cells like "A." or "1." in the WHO workbooks are list numbering, not cause names.
+# Skip workbook list markers.
 LIST_MARKER = re.compile(r"^[A-Za-z0-9]{1,4}\.$")
 
 SEX_LABELS = {
@@ -123,99 +123,54 @@ SEX_LABELS = {
     "females": "female", "female": "female", "fmle": "female", "sex_fmle": "female",
 }
 
-# Config ---
-
-# ----------------------------------------------------------------------------
 # Helpers
-# ----------------------------------------------------------------------------
+
 def to_number(value):
-    """Convert a raw value to a float.
+    """Convert a raw value to float."""
 
-    Parameters
-    value: object
-
-    Returns
-    float or None.
-    """
-
-    # Non-existing values handler
+    # Handle missing values.
     if value is None:
         return None
 
-    #Check if value is numeric
+    # Handle numeric values.
     if isinstance(value, (int, float)):
-        return None if pd.isna(value) else float(value) #NaN handler 
-    
-    #Normalized string
+        return None if pd.isna(value) else float(value)
+
+    # Normalize input text.
     text = str(value).strip().lower()
 
-    # Conversion into binary for indicators
+    # Convert availability to binary.
     if text in ("yes", "generally available", "available"):
         return 1.0
     if text in ("no", "generally not available", "not generally available", "not available", "none"):
         return 0.0
 
-    match = re.search(r"-?\d+(\.\d+)?", text) #Regex Matching
+    match = re.search(r"-?\d+(\.\d+)?", text) # Extract numeric values.
     return float(match.group()) if match else None
 
-
 def slug(text):
-    """String to Slug conversion
-
-    Parameters:
-    text: str
-
-    Returns:
-    str
-
-    """
+    """Convert text to a slug."""
     return re.sub(r"[^a-z0-9]+", "_", str(text).lower()).strip("_")
 
-
 def read_json(folder, code):
-    """Load JSON files for indicators
-
-    Parameters
-    folder : pathlib.Path
-       
-    code : str
-        Indicator code.
-
-    Returns
-    list
-    """
-    # Sort by page number
+    """Load paginated indicator JSON."""
+    # Sort pages numerically.
     pages = sorted(folder.glob(f"{code}_p*.json"), key=lambda p: int(p.stem.rsplit("_p", 1)[1]))
     return [json.loads(p.read_text(encoding="utf-8")) for p in pages]
 
-
 def read_worldbank_countries():
-    """World Bank country list
-
-    Returns
-    pandas.DataFrame
-        Columns iso3, country, region, income_group.
-    """
+    """Load World Bank countries."""
     rows = []
     for page in read_json(RAW_DIR / "worldbank", "_countries"):
         for c in page[1] or []:
             region = (c.get("region") or {}).get("value", "").strip()
             if region and region != "Aggregates":
                 rows.append({"iso3": c["id"], "country": c["name"], "region": region,"income_group": (c.get("incomeLevel") or {}).get("value")})
-    
+
     return pd.DataFrame(rows, columns=["iso3", "country", "region", "income_group"])
 
-
 def read_worldbank(countries):
-    """Read World Bank indicators while checking for ISO3 country codes
-
-    Parameters
-    countries: Set of strings
-
-    Returns
-    pandas.DataFrame
-        Columns iso3, year, column, value.
-    """
+    """Load World Bank indicators."""
     rows = []
     for code, (name, _) in WORLDBANK.items():
         pages = read_json(RAW_DIR / "worldbank", code)
@@ -228,24 +183,8 @@ def read_worldbank(countries):
                     rows.append((r["countryiso3code"], int(r["date"]), name, float(r["value"])))
     return pd.DataFrame(rows, columns=["iso3", "year", "column", "value"]) 
 
-
 def pick_total_rows(records):
-    """Keep the 'total' records of one WHO indicator.
-
-    Rules: both sexes (or no sex split); no other breakdown. If every record
-    has a breakdown, use the one that means 'everyone' (adults 18+, all
-    causes, ...) or, if there is only one breakdown value, that one.
-
-    Parameters
-    ----------
-    records : list of dict
-        Raw WHO GHO records.
-
-    Returns
-    -------
-    list of dict
-        The records to keep.
-    """
+    """Select total WHO records."""
     def other_dims(r):
         return tuple(str(r.get(f"Dim{i}")) for i in (1, 2, 3)
                      if r.get(f"Dim{i}Type") and r.get(f"Dim{i}Type") != "SEX" and r.get(f"Dim{i}") is not None)
@@ -256,9 +195,8 @@ def pick_total_rows(records):
                 return SEX_LABELS.get(str(r.get(f"Dim{i}")).lower()) == "both"
         return True
 
-    # Select observations at the country-year level to avoid
-    # discarding valid records when breakdown availability
-    # differs across countries or reporting years.
+    # Keep country-year observations.
+    # Preserve country-year breakdowns.
     records = [r for r in records if is_both(r)]
     plain = [r for r in records if not other_dims(r)]
     if plain:
@@ -268,20 +206,8 @@ def pick_total_rows(records):
         return records
     return [r for r in records if any(m in " ".join(other_dims(r)).upper() for m in TOTAL_MARKERS)]
 
-
 def read_who_gho(countries):
-    """Read every WHO GHO indicator listed in WHO_GHO.
-
-    Parameters
-    ----------
-    countries : set of str
-        Valid ISO3 country codes.
-
-    Returns
-    -------
-    pandas.DataFrame
-        Columns iso3, year, column, value.
-    """
+    """Load configured WHO indicators."""
     rows = []
     for code, (name, _) in WHO_GHO.items():
         pages = read_json(RAW_DIR / "who_gho", code)
@@ -299,20 +225,8 @@ def read_who_gho(countries):
             print(f"  WHO GHO: no usable data for {code} ({name})")
     return pd.DataFrame(rows, columns=["iso3", "year", "column", "value"])
 
-
 def read_owid(countries):
-    """Read every Our World in Data chart listed in OWID.
-
-    Parameters
-    ----------
-    countries : set of str
-        Valid ISO3 country codes.
-
-    Returns
-    -------
-    pandas.DataFrame
-        Columns iso3, year, column, value.
-    """
+    """Load configured OWID indicators."""
     frames = []
     for chart, (name, _) in OWID.items():
         path = RAW_DIR / "owid" / f"{chart}.csv"
@@ -326,37 +240,17 @@ def read_owid(countries):
                                     "value": df[value_col]}))
     return pd.concat(frames) if frames else pd.DataFrame(columns=["iso3", "year", "column", "value"])
 
-
 def read_ghe_workbook(path, measure, countries):
-    """Read one WHO Global Health Estimates workbook (one sheet per year).
-
-    Each sheet has one row per cause and sex and one column per country
-    (a header row with ISO3 codes). The cause name is the right-most text
-    cell left of the country columns.
-
-    Parameters
-    ----------
-    path : pathlib.Path
-        The .xlsx file.
-    measure : str
-        "asdr" or "crude" (stored in the output).
-    countries : set of str
-        Valid ISO3 country codes (used to find the header row).
-
-    Returns
-    -------
-    pandas.DataFrame
-        Columns iso3, year, measure, sex, cause, value.
-    """
+    """Read a WHO GHE workbook."""
     out = []
     for sheet, raw in pd.read_excel(path, sheet_name=None, header=None).items():
         year_match = re.search(r"(19|20)\d{2}", str(sheet))
         if not year_match:
-            continue  # e.g. the "Notes" sheet
+            continue  # Skip notes sheets.
         year = int(year_match.group())
         raw.columns = range(raw.shape[1])
 
-        # header row = the first row that contains many country codes
+        # Find country-code header.
         header = None
         for i in range(min(60, len(raw))):
             if raw.iloc[i].astype(str).str.strip().isin(countries).sum() >= 20:
@@ -370,7 +264,7 @@ def read_ghe_workbook(path, measure, countries):
         label_cols = list(range(min(country_cols)))
         body = raw.iloc[header + 1:]
 
-        # sex column = the label column whose values are mostly sex labels
+        # Find the sex column.
         sex_col = None
         for c in label_cols:
             values = body[c].dropna().astype(str).str.strip().str.lower()
@@ -378,7 +272,7 @@ def read_ghe_workbook(path, measure, countries):
                 sex_col = c
 
         for _, row in body.iterrows():
-            # cause = right-most real text cell (skip list markers like "A." / "1.")
+            # Find the cause label.
             cause = None
             for c in reversed(label_cols):
                 v = row[c]
@@ -393,12 +287,10 @@ def read_ghe_workbook(path, measure, countries):
 
     return pd.DataFrame(out, columns=["iso3", "year", "measure", "sex", "cause", "value"])
 
+# Main pipeline
 
-# ----------------------------------------------------------------------------
-# Main
-# ----------------------------------------------------------------------------
 def main():
-    """Build global_health_dataset.csv (all indicators + causes, not cleaned) and dictionary.csv."""
+    """Build source data and dictionary."""
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     print("Reading country list ...")
@@ -417,22 +309,22 @@ def main():
     print("Reading indicators ...")
     indicators = pd.concat([read_worldbank(countries), read_who_gho(countries), read_owid(countries)])
 
-    # --- choose countries and years -----------------------------------------
+    # Select countries and years.
     keep = sorted(causes["iso3"].unique()) if ONLY_COUNTRIES_WITH_CAUSE_DATA else sorted(countries)
     years = list(range(start_year, last_year + 1))
     grid = pd.MultiIndex.from_product([keep, years], names=["iso3", "year"]).to_frame(index=False)
 
-    # --- indicators: long -> wide -------------------------------------------
+    # Reshape indicator data.
     indicators = indicators[indicators["iso3"].isin(keep) & indicators["year"].between(start_year, last_year)]
     wide_ind = indicators.pivot_table(index=["iso3", "year"], columns="column", values="value",
                                       aggfunc="mean").reset_index()
 
-    # --- causes: long -> wide (one column per cause / measure / sex) --------
+    # Reshape cause data.
     causes = causes.copy()
     causes["column"] = "death_" + causes["measure"] + "_" + causes["cause"].map(slug)
     causes.loc[causes["sex"] != "both", "column"] += "_" + causes["sex"]
-    
-    # Check whether different causes map to the same column name.
+
+    # Check duplicate cause names.
     cause_mapping = causes.groupby("column")["cause"].nunique()
     conflicts = cause_mapping[cause_mapping > 1]
 
@@ -441,7 +333,7 @@ def main():
             f"Different causes share the same column name: "
             f"{conflicts.index.tolist()}"
         )
-    
+
     dupes = causes.duplicated(["iso3", "year", "column"]).sum()
     if dupes:
         print(f"  warning: {dupes} cause values share a column name and were averaged")
@@ -450,7 +342,7 @@ def main():
                                      values="value",
                                      aggfunc="mean").reset_index()
 
-    # --- merge everything -----------------------------------------------------
+    # Merge source data.
     data = grid.merge(meta, on="iso3", how="left")
     data = data.merge(wide_ind, on=["iso3", "year"], how="left")
     data = data.merge(wide_causes, on=["iso3", "year"], how="left")
@@ -460,7 +352,7 @@ def main():
     data = data[["iso3", "country", "region", "income_group", "year"] + ind_cols + cause_cols]
     data.to_csv(OUT_DIR / "global_health_dataset.csv", index=False)
 
-    # --- data dictionary: one row per data column ------------------------------
+    # Build the data dictionary.
     rows = []
     for source, table in (("World Bank", WORLDBANK), ("WHO GHO", WHO_GHO), ("OWID", OWID)):
         for code, (name, group) in table.items():
@@ -476,7 +368,6 @@ def main():
     print(f"Written to {OUT_DIR / 'global_health_dataset.csv'} and dictionary.csv")
     if missing:
         print("Indicators without data (not in the file):", ", ".join(missing))
-
 
 if __name__ == "__main__":
     main()
