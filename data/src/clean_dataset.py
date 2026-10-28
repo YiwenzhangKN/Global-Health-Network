@@ -1,3 +1,4 @@
+from matplotlib.table import table
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -8,7 +9,7 @@ OUT_DIR = Path("./../data/processed")
 
 YEAR = 2019 #Year used for analysis, 2019 due to WHO reporting
 WINDOW_START = 2013 # start of period
-MAX_MISSING_COUNTRY = 0.2 #Countries containing only 20% of indicators are dropped
+MAX_MISSING_COUNTRY = 0.2 #Exclude countries with more than 20% missing indicator values
 
 # Indicators to drop based on findings in "initial_eda.ipynb", which contains the explanations
 DROP_INDICATORS = ["mri_per1m", "caesarean_rate", "gamma_camera_per1m", "pet_per1m", "hpv_coverage", "avail_chemotherapy", "air_pollution_mortality","linear_accelerator_per1m", "telecobalt_per1m","death_registration_completeness","hepb3_coverage", "hib3_coverage", "pcv3_coverage", "rota_coverage"]
@@ -51,8 +52,9 @@ def latest_indicator_values(data, indicators):
     recent = data[data["year"].between(WINDOW_START, YEAR)].sort_values("year") # Recent years sorted by year
     latest = recent.groupby("iso3")[indicators].last() # Latest values per country
 
-    #Battle deaths with missing values indicate that country was not at war, therefore filled with 0
-    # Converted to per 100,000 to align with other indexes
+    # Convert battle deaths to a rate per 100,000 inhabitants.
+    # Missing battle-death observations are currently treated as zero;
+    # this assumption requires verification against the source metadata.
     if "battle_deaths" in latest:
         latest["battle_deaths"] = latest["battle_deaths"].fillna(0) / latest["population"] * 100_000
         latest = latest.rename(columns={"battle_deaths": "battle_deaths_per100k"})
@@ -115,13 +117,19 @@ def log_skewed(table):
 
 def main():
     """Main Function"""
-    OUT_DIR.mkdir(parents=True, exist_ok=True) #Create output dir.
+    OUT_DIR.mkdir(parents=True, exist_ok=True) #Create output dir
 
     # Load data
     data = pd.read_csv(IN_DIR / "global_health_dataset.csv")
     dictionary = pd.read_csv(IN_DIR / "dictionary.csv")
 
-    #Correct data errors
+    # Validate the uniqueness of country-year observations
+    if data.duplicated(subset=["iso3", "year"]).any():
+        raise ValueError(
+            "Duplicate country-year records found in the input dataset."
+        )
+
+    #Correct known data errors identified during initial EDA
     for iso3, year, column in DATA_ERRORS:
         data.loc[(data["iso3"] == iso3) & (data["year"] == year), column] = np.nan
 
@@ -143,11 +151,23 @@ def main():
 
     table = table.drop(index=dropped) #Drop columns
 
-    # Fill missing values
-    n_filled = int(table.isna().sum().sum())
-    table = fill_missing(table, meta.loc[table.index, "income_group"]).copy()
-    print(f"Filled values: {n_filled}")
+    # Impute missing values using income-group medians,
+    # followed by the global median when necessary
+    missing_before = int(table.isna().sum().sum())
 
+    table = fill_missing(
+    table, meta.loc[table.index, "income_group"]
+    )
+
+    missing_after = int(table.isna().sum().sum())
+
+    if missing_after > 0:
+        raise ValueError(
+            f"{missing_after} missing values remain after imputation."
+        )
+
+    print(f"Missing values filled: {missing_before - missing_after}")
+    
     # 
     clean = meta.loc[table.index].join(table).reset_index()
     clean.to_csv(OUT_DIR / f"clean_{YEAR}.csv", index=False)
