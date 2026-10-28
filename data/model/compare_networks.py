@@ -11,7 +11,7 @@ import build_network as nb
 DATA_FILE = Path("./../data/processed/clean_2019.csv")
 DICTIONARY_FILE = Path("./../data/preprocessed/dictionary.csv")
 OUT_DIR = Path("./../data/network")
-N_BOOTSTRAP = 100
+N_BOOTSTRAP = 100 #Comparison of networks using resamplling
 STABLE = 0.5   # a link is stable if it appears in at least half of the resampled networks
 
 LEVEL2_GROUPS = [   # WHO second-level cause groups
@@ -85,10 +85,10 @@ def links(data, causes, method, alpha=None):
     float or None, alpha used
     """
     with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
+        warnings.simplefilter("ignore") #Ignore warning from glasso
         matrix, alpha = nb.cause_links(data, causes, method, alpha)
     values = matrix.values
-    rows, cols = np.where(np.triu(values >= nb.THRESHOLD[method], k=1))
+    rows, cols = np.where(np.triu(values >= nb.THRESHOLD[method], k=1)) # upper triangle of matrix, excluding diagonal
     return matrix, {(causes[i], causes[j]) for i, j in zip(rows, cols)}, alpha
 
 
