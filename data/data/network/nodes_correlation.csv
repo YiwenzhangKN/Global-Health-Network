@@ -1,0 +1,205 @@
+id,community,type,label,category,median_rate,degree,strength,betweenness,stability
+death_asdr_leishmaniasis,0,cause,leishmaniasis,communicable,0.0,0,0.0,0.0,0.0
+death_asdr_nasopharynx,0,cause,nasopharynx,noncommunicable,0.392,0,0.0,0.0,0.0
+death_asdr_natural_disasters,0,cause,natural disasters,injuries,0.027,0,0.0,0.0,0.0
+gov_health_exp_pct_che,0,indicator,gov health exp pct che,system_input,0.0,0,0.0,0.0,0.0
+external_health_exp_pct_che,0,indicator,external health exp pct che,system_input,0.0,0,0.0,0.0,0.0
+extreme_poverty,0,indicator,extreme poverty,context,0.0,0,0.0,0.0,0.0
+ct_per1m,0,indicator,ct per1m,system_input,0.0,0,0.0,0.0,0.0
+avail_dialysis,0,indicator,avail dialysis,treatment_availability,0.0,0,0.0,0.0,0.0
+avail_stroke_care,0,indicator,avail stroke care,treatment_availability,0.0,0,0.0,0.0,0.0
+avail_insulin,0,indicator,avail insulin,treatment_availability,0.0,0,0.0,0.0,0.0
+avail_metformin,0,indicator,avail metformin,treatment_availability,0.0,0,0.0,0.0,0.0
+avail_statins,0,indicator,avail statins,treatment_availability,0.0,0,0.0,0.0,0.0
+avail_ace_inhibitors,0,indicator,avail ace inhibitors,treatment_availability,0.0,0,0.0,0.0,0.0
+avail_bronchodilators,0,indicator,avail bronchodilators,treatment_availability,0.0,0,0.0,0.0,0.0
+avail_diabetes_testing,0,indicator,avail diabetes testing,treatment_availability,0.0,0,0.0,0.0,0.0
+avail_cervical_cytology,0,indicator,avail cervical cytology,treatment_availability,0.0,0,0.0,0.0,0.0
+avail_breast_screening,0,indicator,avail breast screening,treatment_availability,0.0,0,0.0,0.0,0.0
+avail_colon_screening,0,indicator,avail colon screening,treatment_availability,0.0,0,0.0,0.0,0.0
+avail_palliative_care,0,indicator,avail palliative care,treatment_availability,0.0,0,0.0,0.0,0.0
+cancer_registry,0,indicator,cancer registry,treatment_availability,0.0,0,0.0,0.0,0.0
+ihr_capacity,0,indicator,ihr capacity,system_output,0.0,0,0.0,0.0,0.0
+under5_mortality,1,indicator,under5 mortality,outcome,0.0,42,0.0,0.0,0.0
+death_asdr_diarrhoeal_diseases,1,cause,diarrhoeal diseases,communicable,4.346,39,17.942,0.0322,0.545
+hdi,1,indicator,hdi,context,0.0,38,0.0,0.0,0.0
+death_asdr_meningitis,1,cause,meningitis,communicable,1.005,36,16.721,0.0324,0.744
+pop_65plus_pct,1,indicator,pop 65plus pct,context,0.0,34,0.0,0.0,0.0
+life_expectancy,1,indicator,life expectancy,outcome,0.0,34,0.0,0.0,0.0
+psychiatrists_per100k,1,indicator,psychiatrists per100k,system_input,0.0,34,0.0,0.0,0.0
+dentists_per10k,1,indicator,dentists per10k,system_input,0.0,33,0.0,0.0,0.0
+death_asdr_gynecological_diseases,1,cause,gynecological diseases,noncommunicable,0.046,31,13.951,0.0388,0.741
+doctors_per10k,1,indicator,doctors per10k,system_input,0.0,31,0.0,0.0,0.0
+death_asdr_diphtheria,1,cause,diphtheria,communicable,0.001,29,13.888,0.0223,0.751
+death_asdr_tetanus,1,cause,tetanus,communicable,0.05,29,13.451,0.0144,0.749
+death_asdr_syphilis,1,cause,syphilis,communicable,0.134,24,11.271,0.0033,0.748
+death_asdr_whooping_cough,1,cause,whooping cough,communicable,0.188,24,11.589,0.0039,0.748
+death_asdr_schistosomiasis,1,cause,schistosomiasis,communicable,0.0,24,9.97,0.018,0.566
+death_asdr_asthma,1,cause,asthma,noncommunicable,6.805,24,10.395,0.0141,0.74
+death_asdr_tuberculosis,1,cause,tuberculosis,communicable,4.516,23,9.909,0.0101,0.736
+death_asdr_preterm_birth_complications,1,cause,preterm birth complications,communicable,7.275,23,10.127,0.0081,0.707
+death_asdr_birth_asphyxia_and_birth_trauma,1,cause,birth asphyxia and birth trauma,communicable,1.876,21,9.473,0.0024,0.628
+death_asdr_cirrhosis_due_to_hepatitis_b,1,cause,cirrhosis due to hepatitis b,noncommunicable,3.967,20,8.499,0.0296,0.709
+hepb_prevalence,1,indicator,hepb prevalence,outcome,0.0,20,0.0,0.0,0.0
+underweight_prevalence,1,indicator,underweight prevalence,risk_factor,0.0,20,0.0,0.0,0.0
+death_asdr_rabies,1,cause,rabies,communicable,0.003,19,8.97,0.0099,0.752
+death_asdr_encephalitis,1,cause,encephalitis,communicable,0.428,18,8.121,0.0102,0.746
+uhc_sub_capacity,1,indicator,uhc sub capacity,system_output,0.0,18,0.0,0.0,0.0
+death_asdr_acute_hepatitis_e,1,cause,acute hepatitis e,communicable,0.023,16,6.818,0.0091,0.549
+death_asdr_alzheimer_disease_and_other_dementias,1,cause,alzheimer disease and other dementias,noncommunicable,46.097,16,6.679,0.0496,0.673
+death_asdr_neural_tube_defects,1,cause,neural tube defects,noncommunicable,0.362,16,6.646,0.0175,0.442
+death_asdr_fire_heat_and_hot_substances,1,cause,fire heat and hot substances,injuries,1.713,16,6.485,0.0474,0.479
+nurses_per10k,1,indicator,nurses per10k,system_input,0.0,16,0.0,0.0,0.0
+death_asdr_thalassaemias,1,cause,thalassaemias,noncommunicable,0.097,15,6.63,0.01,0.711
+fertility_rate,1,indicator,fertility rate,context,0.0,15,0.0,0.0,0.0
+tb_incidence,1,indicator,tb incidence,outcome,0.0,14,0.0,0.0,0.0
+stunting_prevalence,1,indicator,stunting prevalence,risk_factor,0.0,14,0.0,0.0,0.0
+uhc_index,1,indicator,uhc index,system_output,0.0,12,0.0,0.0,0.0
+death_asdr_falls,1,cause,falls,injuries,10.91,9,3.755,0.0008,0.688
+health_exp_pc_ppp,1,indicator,health exp pc ppp,system_input,0.0,9,0.0,0.0,0.0
+death_asdr_acute_hepatitis_b,1,cause,acute hepatitis b,communicable,0.263,8,3.659,0.0046,0.581
+death_asdr_road_injury,1,cause,road injury,injuries,16.9,8,3.072,0.0278,0.65
+skilled_birth_attendance,1,indicator,skilled birth attendance,system_output,0.0,8,0.0,0.0,0.0
+basic_water_access,1,indicator,basic water access,risk_factor,0.0,8,0.0,0.0,0.0
+mean_bmi,1,indicator,mean bmi,risk_factor,0.0,8,0.0,0.0,0.0
+death_asdr_measles,1,cause,measles,communicable,0.013,7,2.803,0.0001,0.715
+death_asdr_acute_hepatitis_a,1,cause,acute hepatitis a,communicable,0.153,7,3.166,0.0016,0.461
+death_asdr_cysticercosis,1,cause,cysticercosis,communicable,0.0,6,2.366,0.0139,0.639
+death_asdr_parkinson_disease,1,cause,parkinson disease,noncommunicable,9.336,6,2.652,0.001,0.683
+death_asdr_urolithiasis,1,cause,urolithiasis,noncommunicable,0.033,6,2.709,0.0007,0.721
+death_asdr_other_liver_cirrhosis,1,cause,other liver cirrhosis,noncommunicable,3.877,5,2.06,0.0038,0.544
+death_asdr_inflammatory_bowel_disease,1,cause,inflammatory bowel disease,noncommunicable,0.578,5,1.94,0.0034,0.428
+death_asdr_chronic_obstructive_pulmonary_disease,1,cause,chronic obstructive pulmonary disease,noncommunicable,41.97,4,1.647,0.0,0.538
+death_asdr_poisonings,1,cause,poisonings,injuries,0.616,3,1.204,0.0097,0.357
+measles_coverage,1,indicator,measles coverage,system_output,0.0,3,0.0,0.0,0.0
+battle_deaths_per100k,1,indicator,battle deaths per100k,context,0.0,3,0.0,0.0,0.0
+death_asdr_liver_cancer_secondary_to_hepatitis_b,1,cause,liver cancer secondary to hepatitis b,noncommunicable,2.18,2,0.985,0.0,0.632
+death_asdr_other_malignant_neoplasms,1,cause,other malignant neoplasms,noncommunicable,13.309,2,0.912,0.0,0.704
+death_asdr_rheumatic_heart_disease,1,cause,rheumatic heart disease,noncommunicable,2.362,2,0.747,0.0,0.633
+death_asdr_cirrhosis_due_to_hepatitis_c,1,cause,cirrhosis due to hepatitis c,noncommunicable,5.392,2,0.874,0.0,0.472
+death_asdr_exposure_to_mechanical_forces,1,cause,exposure to mechanical forces,injuries,1.301,2,0.724,0.0001,0.361
+dtp3_coverage,1,indicator,dtp3 coverage,system_output,0.0,2,0.0,0.0,0.0
+death_asdr_food_borne_trematodes,1,cause,food borne trematodes,communicable,0.0,1,0.377,0.0,0.497
+death_asdr_sudden_infant_death_syndrome,1,cause,sudden infant death syndrome,noncommunicable,0.163,1,0.37,0.0,0.425
+death_asdr_collective_violence_and_legal_intervention,1,cause,collective violence and legal intervention,injuries,0.043,1,0.369,0.0,0.526
+death_asdr_other_haemoglobinopathies_and_haemolytic_anaemias,2,cause,other haemoglobinopathies and haemolytic anaemias,noncommunicable,1.649,44,20.273,0.0533,0.707
+death_asdr_ascariasis,2,cause,ascariasis,communicable,0.008,43,21.302,0.0252,0.559
+death_asdr_maternal_conditions,2,cause,maternal conditions,communicable,0.603,40,18.714,0.0178,0.597
+death_asdr_paralytic_ileus_and_intestinal_obstruction,2,cause,paralytic ileus and intestinal obstruction,noncommunicable,4.318,34,15.558,0.0217,0.69
+death_asdr_malaria,2,cause,malaria,communicable,0.0,31,13.644,0.021,0.325
+death_asdr_hiv_aids,2,cause,hiv aids,communicable,3.475,30,13.231,0.0455,0.661
+death_asdr_other_stds,2,cause,other stds,communicable,0.058,29,12.039,0.0164,0.606
+death_asdr_protein_energy_malnutrition,2,cause,protein energy malnutrition,communicable,3.473,29,13.196,0.0201,0.653
+death_asdr_lower_respiratory_infections,2,cause,lower respiratory infections,communicable,53.221,26,11.757,0.0103,0.688
+wash_mortality,2,indicator,wash mortality,outcome,0.0,26,0.0,0.0,0.0
+death_asdr_gastritis_and_duodenitis,2,cause,gastritis and duodenitis,noncommunicable,0.625,25,10.999,0.0136,0.677
+death_asdr_skin_diseases,2,cause,skin diseases,noncommunicable,4.477,24,11.7,0.007,0.705
+death_asdr_epilepsy,2,cause,epilepsy,noncommunicable,2.126,22,9.109,0.0226,0.546
+uhc_sub_infectious,2,indicator,uhc sub infectious,system_output,0.0,22,0.0,0.0,0.0
+death_asdr_sickle_cell_disorders_and_trait,2,cause,sickle cell disorders and trait,noncommunicable,0.024,21,8.887,0.0166,0.655
+basic_sanitation_access,2,indicator,basic sanitation access,risk_factor,0.0,21,0.0,0.0,0.0
+death_asdr_other_endocrine_blood_and_immune_disorders,2,cause,other endocrine blood and immune disorders,noncommunicable,4.313,20,8.649,0.0225,0.676
+death_asdr_other_urinary_diseases,2,cause,other urinary diseases,noncommunicable,8.937,20,8.956,0.0019,0.707
+death_asdr_cervix_uteri_cancer,2,cause,cervix uteri cancer,noncommunicable,6.056,19,8.373,0.0231,0.655
+death_asdr_rheumatoid_arthritis,2,cause,rheumatoid arthritis,noncommunicable,0.708,19,8.557,0.0206,0.302
+death_asdr_upper_respiratory_infections,2,cause,upper respiratory infections,communicable,0.125,18,7.388,0.0051,0.498
+raised_glucose_prevalence,2,indicator,raised glucose prevalence,risk_factor,0.0,18,0.0,0.0,0.0
+death_asdr_appendicitis,2,cause,appendicitis,noncommunicable,0.426,17,6.933,0.0149,0.648
+death_asdr_neonatal_sepsis_and_infections,2,cause,neonatal sepsis and infections,communicable,0.6,16,7.044,0.0025,0.5
+death_asdr_gallbladder_and_biliary_diseases,2,cause,gallbladder and biliary diseases,noncommunicable,3.515,16,6.809,0.0032,0.685
+death_asdr_other_chronic_kidney_disease,2,cause,other chronic kidney disease,noncommunicable,30.563,16,6.302,0.0057,0.644
+death_asdr_other_congenital_anomalies,2,cause,other congenital anomalies,noncommunicable,2.091,16,6.395,0.0032,0.698
+death_asdr_other_neonatal_conditions,2,cause,other neonatal conditions,communicable,0.716,15,6.651,0.0027,0.491
+death_asdr_diabetes_mellitus,2,cause,diabetes mellitus,noncommunicable,57.614,15,6.548,0.0015,0.691
+death_asdr_yellow_fever,2,cause,yellow fever,communicable,0.0,14,5.901,0.0026,0.588
+death_asdr_other_nutritional_deficiencies,2,cause,other nutritional deficiencies,communicable,0.396,14,5.541,0.001,0.46
+uhc_sub_ncd,2,indicator,uhc sub ncd,system_output,0.0,14,0.0,0.0,0.0
+death_asdr_chronic_kidney_disease_due_to_diabetes,2,cause,chronic kidney disease due to diabetes,noncommunicable,9.9,13,5.94,0.0006,0.698
+hiv_prevalence_15_49,2,indicator,hiv prevalence 15 49,outcome,0.0,13,0.0,0.0,0.0
+death_asdr_dengue,2,cause,dengue,communicable,0.012,12,5.085,0.0005,0.647
+death_asdr_down_syndrome,2,cause,down syndrome,noncommunicable,0.382,12,4.675,0.0113,0.309
+tobacco_prevalence,2,indicator,tobacco prevalence,risk_factor,0.0,12,0.0,0.0,0.0
+death_asdr_prostate_cancer,2,cause,prostate cancer,noncommunicable,13.384,11,4.648,0.0632,0.446
+mcv2_coverage,2,indicator,mcv2 coverage,system_output,0.0,11,0.0,0.0,0.0
+obesity_prevalence,2,indicator,obesity prevalence,risk_factor,0.0,11,0.0,0.0,0.0
+death_asdr_interpersonal_violence,2,cause,interpersonal violence,injuries,3.238,10,4.048,0.0068,0.649
+death_asdr_other_circulatory_diseases,2,cause,other circulatory diseases,noncommunicable,26.646,8,3.141,0.0056,0.266
+beds_per10k,2,indicator,beds per10k,system_input,0.0,8,0.0,0.0,0.0
+death_asdr_acute_glomerulonephritis,2,cause,acute glomerulonephritis,noncommunicable,0.078,7,2.932,0.0002,0.495
+death_asdr_other_chromosomal_anomalies,2,cause,other chromosomal anomalies,noncommunicable,0.201,4,1.479,0.0002,0.567
+avail_coronary_bypass_stent,2,indicator,avail coronary bypass stent,treatment_availability,0.0,4,0.0,0.0,0.0
+avail_thrombolysis,2,indicator,avail thrombolysis,treatment_availability,0.0,4,0.0,0.0,0.0
+pharmacists_per10k,2,indicator,pharmacists per10k,system_input,0.0,2,0.0,0.0,0.0
+out_of_pocket_pct_che,2,indicator,out of pocket pct che,system_input,0.0,1,0.0,0.0,0.0
+death_asdr_kidney_cancer,3,cause,kidney cancer,noncommunicable,2.343,21,9.382,0.0507,0.924
+death_asdr_pancreas_cancer,3,cause,pancreas cancer,noncommunicable,6.506,16,7.175,0.0159,0.921
+death_asdr_malignant_skin_melanoma,3,cause,malignant skin melanoma,noncommunicable,0.655,15,6.5,0.0481,0.837
+death_asdr_brain_and_nervous_system_cancers,3,cause,brain and nervous system cancers,noncommunicable,3.556,14,6.732,0.01,0.927
+death_asdr_multiple_sclerosis,3,cause,multiple sclerosis,noncommunicable,0.145,13,5.542,0.0289,0.914
+death_asdr_bladder_cancer,3,cause,bladder cancer,noncommunicable,3.552,12,5.067,0.0059,0.927
+death_asdr_colon_and_rectum_cancers,3,cause,colon and rectum cancers,noncommunicable,14.522,11,5.386,0.0038,0.924
+death_asdr_leukaemia,3,cause,leukaemia,noncommunicable,5.489,11,4.588,0.0097,0.927
+death_asdr_non_melanoma_skin_cancer,3,cause,non melanoma skin cancer,noncommunicable,1.194,10,4.306,0.0008,0.928
+death_asdr_testicular_cancer,3,cause,testicular cancer,noncommunicable,0.126,9,3.929,0.0013,0.927
+death_asdr_mesothelioma,3,cause,mesothelioma,noncommunicable,0.116,9,4.156,0.0005,0.928
+death_asdr_hodgkin_lymphoma,3,cause,hodgkin lymphoma,noncommunicable,0.402,9,4.09,0.0035,0.927
+death_asdr_trachea_bronchus_lung_cancers,3,cause,trachea bronchus lung cancers,noncommunicable,20.461,8,3.758,0.0029,0.928
+death_asdr_ovary_cancer,3,cause,ovary cancer,noncommunicable,3.121,8,3.387,0.0072,0.924
+death_asdr_opioid_use_disorders,3,cause,opioid use disorders,noncommunicable,0.383,8,3.674,0.0559,0.849
+pm25_exposure,3,indicator,pm25 exposure,risk_factor,0.0,8,0.0,0.0,0.0
+death_asdr_breast_cancer,3,cause,breast cancer,noncommunicable,13.684,7,3.356,0.0119,0.92
+death_asdr_corpus_uteri_cancer,3,cause,corpus uteri cancer,noncommunicable,1.923,7,3.297,0.0086,0.92
+death_asdr_larynx_cancer,3,cause,larynx cancer,noncommunicable,1.476,7,2.859,0.0268,0.885
+death_asdr_multiple_myeloma,3,cause,multiple myeloma,noncommunicable,1.721,7,3.191,0.0163,0.92
+radiotherapy_per1m,3,indicator,radiotherapy per1m,system_input,0.0,7,0.0,0.0,0.0
+death_asdr_gallbladder_and_biliary_tract_cancer,3,cause,gallbladder and biliary tract cancer,noncommunicable,1.265,6,2.227,0.0141,0.763
+death_asdr_cocaine_use_disorders,3,cause,cocaine use disorders,noncommunicable,0.054,6,2.973,0.0057,0.849
+death_asdr_other_drug_use_disorders,3,cause,other drug use disorders,noncommunicable,0.059,6,3.395,0.003,0.849
+death_asdr_stomach_cancer,3,cause,stomach cancer,noncommunicable,8.166,5,1.905,0.0003,0.877
+death_asdr_other_pharynx,3,cause,other pharynx,noncommunicable,0.861,4,1.948,0.0065,0.768
+death_asdr_amphetamine_use_disorders,3,cause,amphetamine use disorders,noncommunicable,0.023,4,2.527,0.0,0.849
+death_asdr_lip_and_oral_cavity,3,cause,lip and oral cavity,noncommunicable,2.265,3,1.554,0.0013,0.776
+death_asdr_oesophagus_cancer,3,cause,oesophagus cancer,noncommunicable,3.724,3,1.367,0.006,0.769
+death_asdr_non_hodgkin_lymphoma,3,cause,non hodgkin lymphoma,noncommunicable,4.53,3,1.445,0.0001,0.923
+death_asdr_thyroid_cancer,3,cause,thyroid cancer,noncommunicable,0.73,2,0.733,0.0001,0.706
+avail_kidney_transplant,3,indicator,avail kidney transplant,treatment_availability,0.0,1,0.0,0.0,0.0
+death_asdr_other_infectious_diseases,4,cause,other infectious diseases,communicable,6.564,26,10.808,0.0759,0.89
+death_asdr_other_neoplasms,4,cause,other neoplasms,noncommunicable,2.297,18,8.549,0.013,0.925
+death_asdr_other_digestive_diseases,4,cause,other digestive diseases,noncommunicable,5.925,18,9.386,0.0162,0.925
+death_asdr_iron_deficiency_anaemia,4,cause,iron deficiency anaemia,communicable,0.0,17,9.666,0.0341,0.926
+death_asdr_back_and_neck_pain,4,cause,back and neck pain,noncommunicable,0.0,17,9.35,0.025,0.926
+death_asdr_other_musculoskeletal_disorders,4,cause,other musculoskeletal disorders,noncommunicable,1.351,16,6.714,0.0116,0.895
+death_asdr_idiopathic_intellectual_disability,4,cause,idiopathic intellectual disability,noncommunicable,0.0,15,7.95,0.007,0.926
+death_asdr_benign_prostatic_hyperplasia,4,cause,benign prostatic hyperplasia,noncommunicable,0.0,15,8.574,0.0179,0.926
+death_asdr_schizophrenia,4,cause,schizophrenia,noncommunicable,0.0,14,8.155,0.0102,0.926
+death_asdr_osteoarthritis,4,cause,osteoarthritis,noncommunicable,0.0,14,8.259,0.0066,0.926
+health_exp_pct_gdp,4,indicator,health exp pct gdp,system_input,0.0,13,0.0,0.0,0.0
+death_asdr_otitis_media,4,cause,otitis media,communicable,0.003,12,4.781,0.0114,0.673
+death_asdr_gout,4,cause,gout,noncommunicable,0.0,12,6.462,0.001,0.926
+death_asdr_other_unintentional_injuries,4,cause,other unintentional injuries,injuries,10.037,12,4.769,0.0138,0.698
+death_asdr_other_neurological_conditions,4,cause,other neurological conditions,noncommunicable,2.001,11,5.047,0.0022,0.926
+death_asdr_other_respiratory_diseases,4,cause,other respiratory diseases,noncommunicable,5.439,11,4.627,0.0069,0.912
+death_asdr_acute_hepatitis_c,4,cause,acute hepatitis c,communicable,0.091,8,3.616,0.0085,0.82
+death_asdr_chagas_disease,4,cause,chagas disease,communicable,0.0,6,2.324,0.0045,0.641
+uhc_sub_rmnch,4,indicator,uhc sub rmnch,system_output,0.0,2,0.0,0.0,0.0
+death_asdr_drowning,5,cause,drowning,injuries,3.446,14,5.719,0.006,0.44
+death_asdr_alcohol_use_disorders,5,cause,alcohol use disorders,noncommunicable,2.0,10,4.129,0.0372,0.44
+death_asdr_peptic_ulcer_disease,5,cause,peptic ulcer disease,noncommunicable,5.485,10,3.942,0.0021,0.474
+death_asdr_self_harm,5,cause,self harm,injuries,10.421,10,4.109,0.008,0.48
+death_asdr_cardiomyopathy_myocarditis_endocarditis,5,cause,cardiomyopathy myocarditis endocarditis,noncommunicable,8.448,9,3.615,0.0107,0.545
+alcohol_per_capita,5,indicator,alcohol per capita,risk_factor,0.0,9,0.0,0.0,0.0
+death_asdr_haemorrhagic_stroke,5,cause,haemorrhagic stroke,noncommunicable,55.533,7,2.995,0.0071,0.434
+ncd_mortality_30_70,5,indicator,ncd mortality 30 70,outcome,0.0,7,0.0,0.0,0.0
+death_asdr_ischaemic_stroke,5,cause,ischaemic stroke,noncommunicable,90.76,6,2.535,0.0302,0.495
+death_asdr_cirrhosis_due_to_alcohol_use,5,cause,cirrhosis due to alcohol use,noncommunicable,7.709,6,2.655,0.0055,0.474
+death_asdr_pancreatitis,5,cause,pancreatitis,noncommunicable,2.048,5,1.879,0.0048,0.49
+hypertension_prevalence,5,indicator,hypertension prevalence,risk_factor,0.0,4,0.0,0.0,0.0
+death_asdr_ischaemic_heart_disease,5,cause,ischaemic heart disease,noncommunicable,176.113,3,1.45,0.0042,0.268
+insufficient_activity,5,indicator,insufficient activity,risk_factor,0.0,3,0.0,0.0,0.0
+death_asdr_hypertensive_heart_disease,5,cause,hypertensive heart disease,noncommunicable,41.168,2,0.81,0.0,0.349
+death_asdr_congenital_heart_anomalies,5,cause,congenital heart anomalies,noncommunicable,2.437,2,0.972,0.0054,0.252
+urban_pct,5,indicator,urban pct,context,0.0,2,0.0,0.0,0.0
+government_effectiveness,5,indicator,government effectiveness,context,0.0,1,0.0,0.0,0.0
+death_asdr_liver_cancer_secondary_to_hepatitis_c,6,cause,liver cancer secondary to hepatitis c,noncommunicable,2.676,2,0.829,0.0,0.917
+death_asdr_liver_cancer_secondary_to_alcohol_use,6,cause,liver cancer secondary to alcohol use,noncommunicable,2.529,2,1.028,0.0,0.938
+death_asdr_other_liver_cancer,6,cause,other liver cancer,noncommunicable,0.425,2,1.124,0.0,0.95
