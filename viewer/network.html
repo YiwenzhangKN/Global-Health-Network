@@ -3,580 +3,512 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Global Disease Network</title>
+<title>Network Analysis of Causes of Death Across Countries</title>
 <style>
   :root {
-    --surface: #fcfcfb; --surface-2: #f3f2ee; --border: #e1e0d9; --axis: #c3c2b7;
-    --text: #1b1b1a; --text-2: #55554f; --muted: #8a8a80;
-    --link: #8a8a80; --neutral-node: #b5b4ab;
-    --protective: #2a78d6; --harmful: #e34948;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --surface: #1a1a19; --surface-2: #232321; --border: #2c2c2a; --axis: #383835;
-      --text: #ecebe6; --text-2: #b4b3ab; --muted: #85857d;
-      --link: #85857d; --neutral-node: #5c5c56;
-      --protective: #3987e5; --harmful: #e66767;
-    }
-  }
-  :root[data-theme="dark"] {
-    --surface: #1a1a19; --surface-2: #232321; --border: #2c2c2a; --axis: #383835;
-    --text: #ecebe6; --text-2: #b4b3ab; --muted: #85857d;
-    --link: #85857d; --neutral-node: #5c5c56;
-    --protective: #3987e5; --harmful: #e66767;
+    --bg: #ffffff; --pane: #f7f7f7; --border: #e1e1e1; --hover: #eef3fa; --active: #e1ebf7;
+    --text: #242424; --text-2: #616161; --muted: #9a9a9a; --accent: #0f6cbd;
+    --link: #c3c7cd; --protective: #0f6cbd; --harmful: #c50f1f; --indicator: #5f6b7a;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--surface); color: var(--text);
-         font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  header { padding: 20px 24px 8px; }
-  h1 { margin: 0 0 4px; font-size: 22px; font-weight: 650; }
-  .sub { margin: 0; color: var(--text-2); max-width: 900px; }
-  .stats { color: var(--muted); font-size: 12px; margin-top: 6px; }
+  html, body { height: 100%; margin: 0; }
+  body { display: flex; flex-direction: column; background: var(--bg); color: var(--text);
+         font: 13px/1.4 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; }
+  button, input, select { font: inherit; color: inherit; }
 
-  .controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center;
-              padding: 12px 24px; border-bottom: 1px solid var(--border); }
-  .controls label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-2); }
-  .controls input[type="search"], .controls select {
-    background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
-    border-radius: 6px; padding: 5px 8px; font: inherit; font-size: 13px; }
-  .controls input[type="search"] { width: 220px; }
-  .controls button { background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
-                     border-radius: 6px; padding: 5px 10px; font: inherit; font-size: 13px; cursor: pointer; }
-
-  .switch { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-  .switch button { border: none; border-radius: 0; background: var(--surface); color: var(--text-2);
-                   padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+  /* top bar */
+  .topbar { min-height: 48px; flex: none; display: flex; align-items: center; gap: 16px; padding: 0 16px;
+            border-bottom: 1px solid var(--border); }
+  .brand { font-size: 15px; font-weight: 600; flex: none; white-space: nowrap; }
+  #search { flex: 1 1 180px; max-width: 420px; height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: 4px;
+            background: var(--pane); }
+  #search:focus { outline: none; border-color: var(--accent); background: var(--bg); }
+  .switch { margin-left: auto; display: flex; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+  .switch button { border: 0; background: var(--bg); padding: 6px 14px; cursor: pointer; color: var(--text-2); }
   .switch button + button { border-left: 1px solid var(--border); }
-  .switch button.on { background: var(--text); color: var(--surface); font-weight: 600; }
-  .switch button:disabled { opacity: 0.4; cursor: not-allowed; }
-  .method-note { margin: 8px 0 0; color: var(--text-2); max-width: 900px; font-size: 13px; }
+  .switch button.on { background: var(--active); color: var(--accent); font-weight: 600; }
+  .switch button:disabled { color: var(--muted); cursor: not-allowed; }
+  @media (max-width: 700px) {
+    .topbar { height: auto; flex-wrap: wrap; gap: 8px; padding: 8px 12px; }
+    .brand { width: 100%; white-space: normal; }
+    #search { flex: 1 1 100%; max-width: none; }
+    .switch { width: 100%; margin-left: 0; }
+    .switch button { flex: 1; padding: 6px 8px; white-space: nowrap; }
+  }
 
-  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 10px 24px; font-size: 13px; }
-  .legend-item { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;
-                 padding: 2px 6px; border-radius: 6px; border: 1px solid transparent; }
-  .legend-item:hover { border-color: var(--border); }
-  .legend-item.off { opacity: 0.35; }
-  .swatch { width: 12px; height: 12px; border-radius: 50%; flex: none; }
-  .legend-note { color: var(--muted); font-size: 12px; padding: 0 24px 6px; }
-  .key { display: inline-flex; align-items: center; gap: 5px; margin-right: 14px; }
-  .key svg { flex: none; }
+  /* main area */
+  .app { flex: 1; display: flex; min-height: 0; }
+  nav { width: 260px; flex: none; background: var(--pane); border-right: 1px solid var(--border); overflow-y: auto; padding: 8px 0; }
+  .nav-title { padding: 12px 16px 4px; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .nav-item { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 16px; border: 0; background: none;
+              text-align: left; cursor: pointer; }
+  .nav-item:hover { background: var(--hover); }
+  .nav-item.on { background: var(--active); font-weight: 600; }
+  .nav-item.off { color: var(--muted); }
+  .nav-item.off .dot { opacity: .25; }
+  .nav-item .count { margin-left: auto; color: var(--text-2); font-variant-numeric: tabular-nums; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  @media (max-width: 700px) {
+    .app { flex-direction: column; }
+    nav { width: 100%; max-height: 38vh; border-right: 0; border-bottom: 1px solid var(--border); }
+    .status { width: 100%; min-width: 0; overflow-x: auto; flex-wrap: nowrap; }
+    .status span { flex: none; }
+  }
+  .filters { padding: 4px 16px 12px; display: grid; gap: 8px; }
+  .filters label { display: flex; align-items: center; gap: 6px; color: var(--text-2); }
+  .filters select, .filters input[type=range] { width: 100%; }
+  .filters select { padding: 3px 4px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); }
+  .filters .row { display: flex; justify-content: space-between; color: var(--text-2); }
+  .small-btn { border: 1px solid var(--border); background: var(--bg); border-radius: 4px; padding: 4px 10px; cursor: pointer; }
 
-  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 0; border-top: 1px solid var(--border); }
-  #chart { position: relative; height: 74vh; min-height: 480px; }
+  main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .toolbar { height: 40px; flex: none; display: flex; align-items: stretch; gap: 4px; padding: 0 12px;
+             border-bottom: 1px solid var(--border); }
+  .toolbar button { border: 0; background: none; padding: 0 12px; cursor: pointer; color: var(--text-2);
+                    border-bottom: 2px solid transparent; }
+  .toolbar button:hover { color: var(--text); }
+  .toolbar button.on { color: var(--text); font-weight: 600; border-bottom-color: var(--accent); }
+  .toolbar .count { color: var(--muted); font-weight: 400; margin-left: 4px; }
+  .content { flex: 1; min-height: 0; display: flex; }
+  .content[hidden] { display: none; }
+  #view-report { display: none; flex: 1; }
+  body.report-mode nav, body.report-mode .toolbar, body.report-mode .content, body.report-mode #search,
+  body.report-mode .status { display: none; }
+  body.report-mode #view-report { display: flex; }
+  .view { flex: 1; min-width: 0; display: flex; }
+  .view[hidden] { display: none; }
+  #chart { flex: 1; min-width: 0; position: relative; }
   #chart svg { width: 100%; height: 100%; display: block; cursor: grab; }
-  #chart svg:active { cursor: grabbing; }
-  aside { border-left: 1px solid var(--border); padding: 16px 18px; overflow-y: auto; height: 74vh; min-height: 480px; }
-  aside h2 { font-size: 16px; margin: 0 0 4px; }
-  aside .meta { color: var(--text-2); font-size: 13px; margin: 0 0 12px; }
-  aside table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-  aside td { padding: 3px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
-  aside td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; padding-left: 8px; }
-  .hint { color: var(--muted); font-size: 13px; }
-  .tag { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 10px;
-         background: var(--surface-2); color: var(--text-2); border: 1px solid var(--border); }
+  #details { width: 320px; flex: none; border-left: 1px solid var(--border); overflow-y: auto; padding: 16px; }
+  #details h2 { margin: 0 0 4px; font-size: 16px; font-weight: 600; }
+  #details .sub { color: var(--text-2); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+  .kv { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin-bottom: 14px; }
+  .kv span:nth-child(odd) { color: var(--text-2); }
+  .kv span:nth-child(even) { text-align: right; font-variant-numeric: tabular-nums; }
+  .empty { color: var(--muted); }
 
-  .node-label { font-size: 10px; fill: var(--text); pointer-events: none; paint-order: stroke;
-                stroke: var(--surface); stroke-width: 3px; }
-  #tooltip { position: fixed; pointer-events: none; z-index: 10; background: var(--surface);
-             border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 12.5px;
-             box-shadow: 0 4px 16px rgba(0,0,0,.12); max-width: 280px; display: none; }
-  #tooltip b { display: block; margin-bottom: 2px; }
-  #tooltip .row { color: var(--text-2); }
+  /* tables */
+  .table-wrap { flex: 1; overflow: auto; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { padding: 5px 10px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+  th { position: sticky; top: 0; background: var(--bg); font-weight: 600; cursor: pointer; user-select: none; z-index: 1; }
+  th:hover { background: var(--hover); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover { background: var(--hover); }
+  #details table th { position: static; cursor: default; }
+  #details td, #details th { padding: 4px 0; }
+  #details td.num { padding-left: 8px; }
 
-  details.table-view { padding: 12px 24px 28px; border-top: 1px solid var(--border); }
-  details.table-view summary { cursor: pointer; font-weight: 600; }
-  details.table-view table { border-collapse: collapse; font-size: 12.5px; margin-top: 10px; width: 100%; max-width: 1000px; }
-  details.table-view th, details.table-view td { text-align: left; padding: 4px 10px 4px 0; border-bottom: 1px solid var(--border); }
-  details.table-view td.num, details.table-view th.num { text-align: right; font-variant-numeric: tabular-nums; }
-  .table-wrap { overflow-x: auto; }
+  #report-frame { flex: 1; border: 0; }
 
-  #loader { padding: 40px 24px; }
-  #loader p { color: var(--text-2); }
+  .status { height: 26px; flex: none; display: flex; align-items: center; gap: 16px; padding: 0 16px;
+            border-top: 1px solid var(--border); background: var(--pane); color: var(--text-2); font-size: 12px; }
 
-  @media (max-width: 860px) {
-    .layout { grid-template-columns: 1fr; }
-    aside { border-left: none; border-top: 1px solid var(--border); height: auto; min-height: 0; }
-    #chart { height: 62vh; min-height: 380px; }
-    header, .controls, .legend, .legend-note, details.table-view { padding-left: 16px; padding-right: 16px; }
-    .controls input[type="search"] { width: 100%; }
+  .node-label { font-size: 10px; fill: var(--text); pointer-events: none; paint-order: stroke; stroke: #fff; stroke-width: 3px; }
+  #tooltip { position: fixed; pointer-events: none; z-index: 10; background: var(--bg); border: 1px solid var(--border);
+             border-radius: 4px; padding: 6px 8px; box-shadow: 0 2px 8px rgba(0,0,0,.12); display: none; font-size: 12px; }
+  #tooltip b { display: block; }
+  #loader { padding: 24px; }
+  @media (max-width: 700px) {
+    html, body { height: auto; min-height: 100%; }
+    body { min-height: 100vh; }
+    .app { display: block; flex: none; }
+    nav { width: 100%; max-height: 38vh; overflow-y: auto; }
+    main { min-height: 70vh; }
+    .content { min-height: 65vh; }
+    #view-network { flex-direction: column; min-height: 65vh; }
+    #chart { min-height: 45vh; }
+    #details { width: 100%; max-height: 20vh; border-left: 0; border-top: 1px solid var(--border); }
   }
 </style>
 </head>
 <body>
-<header>
-  <h1>Global disease network (2019)</h1>
-  <p class="sub">Causes of death are linked if they are high in the same countries, after removing the effect of national wealth (GDP per capita).
-     Health-system and risk-factor indicators are linked to the causes they are associated with.
-     Hover a node for details, click it to list its links, drag to move, scroll to zoom.</p>
-  <div style="margin-top:12px" class="switch" role="group" aria-label="Network">
-    <button data-method="correlation">Co-occurrence</button>
-    <button data-method="glasso">Direct links</button>
+
+<header class="topbar">
+  <div class="brand">Network Analysis of Causes of Death Across Countries</div>
+  <input id="search" type="search" list="node-list" placeholder="Search cause or indicator">
+  <datalist id="node-list"></datalist>
+  <div class="switch" role="group" aria-label="Network">
+    <button data-tab="glasso">Direct links</button>
+    <button data-tab="correlation">Co-occurrence</button>
+    <button data-tab="report">Report</button>
   </div>
-  <p class="method-note" id="method-note"></p>
-  <div class="stats" id="stats"></div>
 </header>
 
-<div class="controls">
-  <label>Search <input type="search" id="search" list="node-list" placeholder="e.g. tuberculosis"></label>
-  <datalist id="node-list"></datalist>
-  <label>Colour by
-    <select id="color-by">
-      <option value="community">community</option>
-      <option value="category">WHO cause group</option>
-    </select>
-  </label>
-  <label><input type="checkbox" id="show-indicators"> health-system indicators</label>
-  <label>Indicator links
-    <select id="link-sign">
-      <option value="all">all</option>
-      <option value="-1">protective only (−)</option>
-      <option value="1">harmful only (+)</option>
-    </select>
-  </label>
-  <label>Min. link strength <input type="range" id="min-weight" min="0" max="1" step="0.01" value="0"> <span id="min-weight-value">0.00</span></label>
-  <label><input type="checkbox" id="fade-unstable"> fade unstable causes</label>
-  <label><input type="checkbox" id="show-labels"> labels</label>
-  <button id="reset">Reset</button>
+<div class="app">
+  <nav>
+    <div class="nav-title">Communities</div>
+    <div id="communities"></div>
+
+    <div class="nav-title">Filters</div>
+    <div class="filters">
+      <label>Colour
+        <select id="color-by"><option value="community">community</option><option value="category">WHO group</option></select>
+      </label>
+      <label><input type="checkbox" id="show-indicators"> indicators</label>
+      <label>Indicator links
+        <select id="link-sign"><option value="all">all</option><option value="-1">negative</option><option value="1">positive</option></select>
+      </label>
+      <div class="row"><span>Min. link</span><span id="min-weight-value">0.00</span></div>
+      <input type="range" id="min-weight" min="0" max="1" step="0.01" value="0">
+      <label><input type="checkbox" id="show-labels"> labels</label>
+      <div><button class="small-btn" id="reset">Reset</button></div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="toolbar">
+      <button class="on" data-view="network">Graph</button>
+      <button data-view="nodes">Nodes<span class="count" id="count-nodes"></span></button>
+      <button data-view="links">Links<span class="count" id="count-links"></span></button>
+    </div>
+    <div class="content">
+    <section class="view" id="view-network">
+      <div id="chart"></div>
+      <aside id="details"><p class="empty">No node selected</p></aside>
+    </section>
+    <section class="view" id="view-nodes" hidden><div class="table-wrap"><table id="nodes-table"></table></div></section>
+    <section class="view" id="view-links" hidden><div class="table-wrap"><table id="links-table"></table></div></section>
+    </div>
+    <section id="view-report"><iframe id="report-frame" title="Report"></iframe></section>
+    <div id="loader" hidden>
+      <p>Network files not found. Select network_glasso.json and network_correlation.json:</p>
+      <input type="file" id="file-input" accept=".json" multiple>
+    </div>
+  </main>
 </div>
 
-<div class="legend" id="legend"></div>
-<div class="legend-note">
-  <span class="key"><svg width="12" height="12"><circle cx="6" cy="6" r="5" fill="var(--neutral-node)"/></svg> cause of death (size = death rate)</span>
-  <span class="key"><svg width="12" height="12"><rect x="1.5" y="1.5" width="9" height="9" fill="var(--neutral-node)"/></svg> indicator</span>
-  <span class="key"><svg width="22" height="8"><line x1="1" y1="4" x2="21" y2="4" stroke="var(--link)" stroke-width="2"/></svg> causes linked (high in the same countries)</span>
-  <span class="key"><svg width="22" height="8"><line x1="1" y1="4" x2="21" y2="4" stroke="var(--protective)" stroke-width="2" stroke-dasharray="4 2"/></svg> protective (more indicator, fewer deaths)</span>
-  <span class="key"><svg width="22" height="8"><line x1="1" y1="4" x2="21" y2="4" stroke="var(--harmful)" stroke-width="2" stroke-dasharray="4 2"/></svg> harmful (more indicator, more deaths)</span>
-  · click a legend entry to show or hide a community · tick "health-system indicators" to add the indicator layer
-</div>
-
-<div class="layout" id="layout">
-  <div id="chart"></div>
-  <aside id="details"><p class="hint">Click a node to see its links.</p></aside>
-</div>
-
-<div id="loader" hidden>
-  <p><b>The network files could not be loaded automatically.</b> Browsers block reading local files when an HTML file is opened directly.
-     Either select <code>network_glasso.json</code> and <code>network_correlation.json</code> here (both at once), or start the
-     viewer server (<code>npm start</code>) and open <code>http://localhost:3000</code>.</p>
-  <input type="file" id="file-input" accept=".json,application/json" multiple>
-</div>
-
-<details class="table-view">
-  <summary>Table view</summary>
-  <div class="table-wrap"><table id="table"></table></div>
-</details>
-
-<div id="tooltip" role="tooltip"></div>
+<footer class="status" id="status"></footer>
+<div id="tooltip"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>
 // Config +++
-const DATA_FILES = {                      // exported by network_builder.py
-  correlation: "network_correlation.json",
-  glasso: "network_glasso.json",
-};
-const DEFAULT_METHOD = "correlation";     // network shown first
+const DATA_FILES = { glasso: "network_glasso.json", correlation: "network_correlation.json" };  // from network_builder.py
+const DEFAULT_METHOD = "glasso";
+const REPORT_FILE = "report.pdf";
 
-// Names of the communities per network (they come from the interpretation, change them if the network changes)
+const METHOD_NAMES = { glasso: "Direct links", correlation: "Co-occurrence" };
 const COMMUNITY_NAMES = {
- correlation: {
-  0: "Isolated causes / unlinked indicators",
-  1: "Vaccine-preventable & basic care",
-  2: "Tropical & poverty-related",
-  3: "Cancers",
-  4: "Low-mortality causes (WHO estimates)",
-  5: "Alcohol-related",
-  6: "Liver cancers",
- },
- glasso: {
-  0: "Isolated causes / unlinked indicators",
-  1: "Cancers",
-  2: "Low-mortality causes & acute hepatitis",
-  3: "Mixed: dementia, chronic & congenital",
-  4: "Maternal, neonatal & tropical",
-  5: "Mixed: infections & digestive",
-  6: "Malnutrition, diarrhoea & diabetes",
-  7: "Cardiovascular & injuries",
-  8: "Alcohol & liver",
-  9: "Vaccine-preventable, TB & hepatitis B",
-  10: "HIV, cervical cancer & violence",
-  11: "Drug use & head-and-neck cancers",
- },
+  glasso: {
+    1: "Cancers", 2: "Low-mortality", 3: "Mixed chronic", 4: "Maternal & tropical", 5: "Infections & digestive",
+    6: "Malnutrition & diarrhoea", 7: "Heart & injuries", 8: "Alcohol & liver", 9: "Vaccine-preventable & TB",
+    10: "HIV & violence", 11: "Drug use & head-neck cancer",
+  },
+  correlation: {
+    1: "Vaccine-preventable & basic care", 2: "Tropical & poverty", 3: "Cancers", 4: "Low-mortality",
+    5: "Alcohol", 6: "Liver cancers",
+  },
 };
-
-// What each network shows (text under the switch)
-const METHOD_NOTE = {
-  correlation: "Co-occurrence: two causes are linked if they are high in the same countries (|ρ| ≥ 0.35). " +
-               "Shows the broad patterns – which diseases go together because they share a setting, such as weak basic care or a region. " +
-               "Some links only exist through such a shared setting.",
-  glasso: "Direct links: two causes are linked only if they are related beyond what all other causes explain (graphical lasso). " +
-          "Shows how specific diseases are tied to each other – sparser, but shared-setting links such as HIV–drowning disappear. " +
-          "Weak links (below about 0.10) are less reliable.",
-};
-
-// How the cause-cause links were computed (network_builder.py, METHOD)
-const METHOD_TEXT = {
-  glasso: "cause–cause links: direct links (graphical lasso partial correlation, given all other causes)",
-  correlation: "cause–cause links: co-occurrence (partial Spearman correlation, GDP removed)",
-};
-const CATEGORY_NAMES = { communicable: "Communicable, maternal, neonatal, nutritional",
-                         noncommunicable: "Noncommunicable", injuries: "Injuries" };
-
-// Colour palette (validated for colour-vision deficiency); one list per light / dark mode
-const COLORS_LIGHT = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"];
-const COLORS_DARK  = ["#3987e5", "#d95926", "#199e70", "#c98500", "#d55181", "#008300", "#9085e9", "#e66767"];
+const COLORS = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b",
+                "#e377c2", "#17becf", "#bcbd22", "#393b79", "#7b4173", "#e7ba52"];   // one colour per community
+const NO_COMMUNITY = "#c8c8c8";
+const CATEGORY_NAMES = { communicable: "Communicable", noncommunicable: "Noncommunicable", injuries: "Injuries" };
 // Config ---
 
-const dark = () => document.documentElement.dataset.theme === "dark" ||
-  (document.documentElement.dataset.theme !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-const palette = () => (dark() ? COLORS_DARK : COLORS_LIGHT);
+const networks = {};
+let method = DEFAULT_METHOD, selectedId = null, currentUpdate = () => {};
+const $ = id => document.getElementById(id);
 const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-let method = DEFAULT_METHOD;               // network currently shown
-const networks = {};                      // method -> loaded network.json content
-let currentUpdate = () => {};             // redraw function of the current network
-let selectedId = null;                    // clicked node, kept when switching networks
-const communityName = c => (COMMUNITY_NAMES[method] || {})[c] || `Community ${c}`;
 const fmt = (v, d = 2) => (v === null || v === undefined || Number.isNaN(+v)) ? "–" : (+v).toFixed(d);
+const communityName = c => c > 0 ? ((COMMUNITY_NAMES[method] || {})[c] || `Community ${c}`) : "No community";
+const communityColor = c => c > 0 ? COLORS[(c - 1) % COLORS.length] : NO_COMMUNITY;
 
-// ---------------------------------------------------------------------------------------------
-// Loading: fetch both networks; if that is blocked (file://), show a file picker instead
-// ---------------------------------------------------------------------------------------------
+// ---- loading -----------------------------------------------------------------------------------
 Promise.all(Object.entries(DATA_FILES).map(([m, file]) =>
-  fetch(file).then(r => r.ok ? r.json() : null).catch(() => null).then(data => { if (data) networks[m] = data; })))
+  fetch(file).then(r => r.ok ? r.json() : null).catch(() => null).then(d => { if (d) networks[m] = d; })))
   .then(start);
 
+$("file-input").onchange = e => Promise.all([...e.target.files].map(f => f.text().then(t => {
+  const d = JSON.parse(t); networks[d.meta.method] = d;
+}))).then(start);
+
 function start() {
-  if (!Object.keys(networks).length) {
-    document.getElementById("loader").hidden = false;
-    document.getElementById("layout").hidden = true;
-    return;
-  }
-  document.getElementById("loader").hidden = true;
-  document.getElementById("layout").hidden = false;
+  const ok = Object.keys(networks).length > 0;
+  $("loader").hidden = ok;
+  document.querySelector(".content").hidden = !ok;
+  if (!ok) return;
   if (!networks[method]) method = Object.keys(networks)[0];
   showNetwork(method);
 }
 
-document.getElementById("file-input").addEventListener("change", e => {
-  Promise.all([...e.target.files].map(file => file.text().then(text => {
-    const data = JSON.parse(text);
-    networks[data.meta.method] = data;
-  }))).then(start);
-});
-
-// switch between the two networks
+let drawn = null;   // network currently drawn
+function setTab(tab) {
+  document.querySelectorAll(".switch button").forEach(b => {
+    b.classList.toggle("on", b.dataset.tab === tab);
+    if (b.dataset.tab !== "report") b.disabled = !networks[b.dataset.tab];
+  });
+  document.body.classList.toggle("report-mode", tab === "report");
+}
 function showNetwork(m) {
   method = m;
-  document.querySelectorAll(".switch button").forEach(b => {
-    b.classList.toggle("on", b.dataset.method === m);
-    b.disabled = !networks[b.dataset.method];
-    b.setAttribute("aria-pressed", b.dataset.method === m);
-  });
-  document.getElementById("method-note").textContent = METHOD_NOTE[m] || "";
-  draw(networks[m]);
+  setTab(m);
+  if (drawn !== m) { drawn = m; draw(networks[m]); }
 }
-document.querySelectorAll(".switch button").forEach(b =>
-  b.addEventListener("click", () => { if (networks[b.dataset.method] && b.dataset.method !== method) showNetwork(b.dataset.method); }));
-window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => currentUpdate());
+function showReport() {
+  setTab("report");
+  if (!$("report-frame").src) $("report-frame").src = REPORT_FILE;
+}
+document.querySelectorAll(".switch button").forEach(b => b.onclick = () => {
+  if (b.dataset.tab === "report") showReport();
+  else if (networks[b.dataset.tab]) showNetwork(b.dataset.tab);
+});
 
-// ---------------------------------------------------------------------------------------------
-// Drawing
-// ---------------------------------------------------------------------------------------------
+// ---- views -------------------------------------------------------------------------------------
+function showView(name) {
+  document.querySelectorAll(".toolbar button").forEach(b => b.classList.toggle("on", b.dataset.view === name));
+  ["network", "nodes", "links"].forEach(v => $(`view-${v}`).hidden = v !== name);
+}
+document.querySelectorAll(".toolbar button").forEach(b => b.onclick = () => showView(b.dataset.view));
+
+// sortable table: columns = [{key, label, num, digits}]
+function renderTable(table, columns, rows, onClick) {
+  let sortKey = null, asc = true;
+  function paint() {
+    const sorted = sortKey === null ? rows : [...rows].sort((a, b) =>
+      (a[sortKey] > b[sortKey] ? 1 : a[sortKey] < b[sortKey] ? -1 : 0) * (asc ? 1 : -1));
+    table.innerHTML = `<thead><tr>${columns.map(c => `<th class="${c.num ? "num" : ""}" data-key="${c.key}">${c.label}${
+      c.key === sortKey ? (asc ? " ▲" : " ▼") : ""}</th>`).join("")}</tr></thead><tbody>${
+      sorted.map((r, i) => `<tr data-i="${rows.indexOf(r)}">${columns.map(c => `<td class="${c.num ? "num" : ""}">${
+        c.html ? c.html(r) : c.num ? fmt(r[c.key], c.digits ?? 2) : r[c.key]}</td>`).join("")}</tr>`).join("")}</tbody>`;
+    table.querySelectorAll("th").forEach(th => th.onclick = () => {
+      const k = th.dataset.key; asc = sortKey === k ? !asc : !columns.find(c => c.key === k).num; sortKey = k; paint();
+    });
+    if (onClick) table.querySelectorAll("tbody tr").forEach(tr => tr.onclick = () => onClick(rows[+tr.dataset.i]));
+  }
+  paint();
+}
+
+// ---- drawing -----------------------------------------------------------------------------------
 function draw(data) {
   const nodes = data.nodes.map(d => ({ ...d }));
-  const links = data.links.map(d => ({ ...d }));
+  const links = data.links.map(d => ({ ...d, sign: d.type === "indicator-cause" ? Math.sign(d.rho) : 1 }));
   const byId = new Map(nodes.map(d => [d.id, d]));
-  links.forEach(l => { l.sign = l.type === "indicator-cause" ? Math.sign(l.rho) : 1; });
-
-  // neighbours of every node (for highlighting and the details panel)
   const neighbours = new Map(nodes.map(d => [d.id, []]));
   links.forEach(l => {
     neighbours.get(l.source).push({ id: l.target, rho: l.rho, type: l.type });
     neighbours.get(l.target).push({ id: l.source, rho: l.rho, type: l.type });
   });
-
   const causes = nodes.filter(d => d.type === "cause");
-  const communities = [...new Set(nodes.map(d => d.community))].sort((a, b) => a - b);
-  const active = new Set(communities);           // communities currently shown
-  let selected = null;                           // clicked node (set again at the end if it exists in this network)
+  const communities = [...new Set(causes.map(d => d.community))].sort((a, b) => a - b);
+  const active = new Set([...communities, 0]);
+  let selected = null;
 
-  document.getElementById("stats").textContent =
-    `${causes.length} causes of death · ${nodes.length - causes.length} indicators · ` +
-    `${links.filter(l => l.type === "cause-cause").length} cause–cause links · ` +
-    `${links.filter(l => l.type === "indicator-cause").length} indicator–cause links · ` +
-    `${METHOD_TEXT[data.meta.method] || METHOD_TEXT.correlation} ≥ ${data.meta.threshold} · ` +
-    `indicator–cause links: |partial Spearman ρ| ≥ ${data.meta.indicator_threshold} (GDP removed)`;
+  // status bar and counts
+  const nCause = links.filter(l => l.type === "cause-cause").length;
+  $("status").innerHTML = [METHOD_NAMES[method], `${causes.length} causes`, `${nodes.length - causes.length} indicators`,
+    `${nCause} cause links`, `${links.length - nCause} indicator links`, `${communities.filter(c => c > 0).length} communities`,
+    `threshold ${data.meta.threshold}`, `indicator threshold ${data.meta.indicator_threshold}`, `control: ${data.meta.control}`]
+    .map(t => `<span>${t}</span>`).join("");
+  $("count-nodes").textContent = nodes.length;
+  $("count-links").textContent = links.length;
 
-  // slider range follows the data (direct links are much smaller numbers than correlations)
-  const minWeight = d3.min(links, l => l.weight), maxWeight = d3.max(links, l => l.weight);
-  const slider = document.getElementById("min-weight");
-  slider.min = Math.floor(minWeight * 100) / 100;
-  slider.max = Math.ceil(maxWeight * 100) / 100;
+  // slider range follows the data
+  const slider = $("min-weight");
+  slider.min = Math.floor(d3.min(links, l => l.weight) * 100) / 100;
+  slider.max = Math.ceil(d3.max(links, l => l.weight) * 100) / 100;
   slider.value = slider.min;
-  document.getElementById("min-weight-value").textContent = (+slider.min).toFixed(2);
-  // strongest link of each type (to scale line widths separately for both link types)
-  const maxOfType = { "cause-cause": d3.max(links, l => l.type === "cause-cause" ? l.weight : 0) || 1,
-                      "indicator-cause": d3.max(links, l => l.type === "indicator-cause" ? l.weight : 0) || 1 };
-  const relWeight = l => l.weight / maxOfType[l.type];
+  $("min-weight-value").textContent = (+slider.min).toFixed(2);
+  const maxOfType = t => d3.max(links, l => l.type === t ? l.weight : 0) || 1;
+  const maxW = { "cause-cause": maxOfType("cause-cause"), "indicator-cause": maxOfType("indicator-cause") };
+  const relWeight = l => l.weight / maxW[l.type];
 
-  // ---- colours -------------------------------------------------------------------------------
-  const categories = ["communicable", "noncommunicable", "injuries"];
+  // colours
+  const categories = Object.keys(CATEGORY_NAMES);
   function nodeColor(d) {
-    const mode = document.getElementById("color-by").value;
-    if (mode === "category") {
-      const i = categories.indexOf(d.category);
-      return i >= 0 ? palette()[i] : css("--neutral-node");
-    }
-    return d.community > 0 ? palette()[(d.community - 1) % palette().length] : css("--neutral-node");
+    if (d.type === "indicator") return css("--indicator");
+    if ($("color-by").value === "category") return COLORS[categories.indexOf(d.category)] || NO_COMMUNITY;
+    return communityColor(d.community);
   }
-  // more communities than colours: communities 9+ reuse the colours as hollow rings (colour + fill style)
-  const hollow = d => document.getElementById("color-by").value === "community" && d.community > palette().length;
+  const linkColor = l => l.type === "cause-cause" ? css("--link") : (l.sign < 0 ? css("--protective") : css("--harmful"));
 
-  function linkColor(l) {
-    if (l.type === "cause-cause") return css("--link");
-    return l.sign < 0 ? css("--protective") : css("--harmful");
-  }
-
-  // ---- layout: communities placed around a circle, nodes pulled towards their community ------
-  const chart = document.getElementById("chart");
-  chart.innerHTML = "";                                                     // remove the previous network
-  const width = chart.clientWidth, height = chart.clientHeight;
-  const ringRadius = Math.min(width, height) * 0.30;
+  // layout: communities on a circle, nodes pulled towards their community
+  const chart = $("chart");
+  chart.innerHTML = "";
+  const area = document.querySelector(".content");   // the graph may be hidden behind a table view
+  const width = chart.clientWidth || Math.max(area.clientWidth - 320, 600), height = chart.clientHeight || area.clientHeight || 600;
   const centers = new Map();
-  const realCommunities = communities.filter(c => c > 0);
-  realCommunities.forEach((c, i) => {
-    const angle = (i / realCommunities.length) * 2 * Math.PI - Math.PI / 2;
-    centers.set(c, [width / 2 + ringRadius * Math.cos(angle), height / 2 + ringRadius * Math.sin(angle)]);
+  const real = communities.filter(c => c > 0);
+  real.forEach((c, i) => {
+    const a = (i / real.length) * 2 * Math.PI - Math.PI / 2, r = Math.min(width, height) * 0.3;
+    centers.set(c, [width / 2 + r * Math.cos(a), height / 2 + r * Math.sin(a)]);
   });
   centers.set(0, [width / 2, height / 2]);
-
-  const rateExtent = d3.extent(causes, d => d.median_rate);
-  const size = d3.scaleSqrt().domain([0, rateExtent[1]]).range([3, 16]);
-  const radius = d => d.type === "cause" ? size(d.median_rate) : 5;
+  const size = d3.scaleSqrt().domain([0, d3.max(causes, d => d.median_rate)]).range([3, 15]);
+  const radius = d => d.type === "cause" ? size(d.median_rate) : 4.5;
 
   const simulation = d3.forceSimulation(nodes)
-    .force("link", d3.forceLink(links).id(d => d.id).strength(l => l.type === "cause-cause" ? relWeight(l) * 0.08 : relWeight(l) * 0.02))
+    .force("link", d3.forceLink(links).id(d => d.id).strength(l => relWeight(l) * (l.type === "cause-cause" ? 0.08 : 0.02)))
     .force("charge", d3.forceManyBody().strength(-45))
-    .force("x", d3.forceX(d => centers.get(d.community)[0]).strength(0.12))
-    .force("y", d3.forceY(d => centers.get(d.community)[1]).strength(0.12))
+    .force("x", d3.forceX(d => (centers.get(d.community) || centers.get(0))[0]).strength(0.12))
+    .force("y", d3.forceY(d => (centers.get(d.community) || centers.get(0))[1]).strength(0.12))
     .force("collide", d3.forceCollide(d => radius(d) + 2))
     .stop();
-  for (let i = 0; i < 400; i++) simulation.tick();   // compute the layout before drawing (no jumping on load)
+  for (let i = 0; i < 400; i++) simulation.tick();
 
-  // ---- SVG -------------------------------------------------------------------------------------
   const svg = d3.select(chart).append("svg").attr("viewBox", [0, 0, width, height]);
   const root = svg.append("g");
   const zoom = d3.zoom().scaleExtent([0.3, 6]).on("zoom", e => root.attr("transform", e.transform));
   svg.call(zoom).on("click", e => { if (e.target === svg.node()) select(null); });
 
   const linkSel = root.append("g").selectAll("line").data(links).join("line")
-    .attr("stroke-width", l => 0.6 + relWeight(l) * 2.4)
+    .attr("stroke-width", l => 0.5 + relWeight(l) * 2.5)
     .attr("stroke-dasharray", l => l.type === "indicator-cause" ? "4 2" : null);
-
-  const nodeSel = root.append("g").selectAll("g").data(nodes).join("g")
-    .attr("class", "node").style("cursor", "pointer")
+  const nodeSel = root.append("g").selectAll("g").data(nodes).join("g").style("cursor", "pointer")
     .call(d3.drag()
       .on("start", (e, d) => { if (!e.active) simulation.alphaTarget(0.2).restart(); d.fx = d.x; d.fy = d.y; })
       .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; })
       .on("end", (e, d) => { if (!e.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; }));
-
   nodeSel.filter(d => d.type === "cause").append("circle").attr("r", radius);
-  nodeSel.filter(d => d.type === "indicator").append("rect")
-    .attr("x", -5).attr("y", -5).attr("width", 10).attr("height", 10);
-  nodeSel.selectAll("circle, rect").attr("stroke", css("--surface")).attr("stroke-width", 1.5);
-
+  nodeSel.filter(d => d.type === "indicator").append("rect").attr("x", -4.5).attr("y", -4.5).attr("width", 9).attr("height", 9);
+  nodeSel.selectAll("circle, rect").attr("stroke", "#fff").attr("stroke-width", 1.2);
   const labelSel = root.append("g").selectAll("text").data(nodes).join("text")
     .attr("class", "node-label").attr("dx", d => radius(d) + 3).attr("dy", 3).text(d => d.label);
 
   function render() {
-    linkSel.attr("x1", l => l.source.x).attr("y1", l => l.source.y)
-           .attr("x2", l => l.target.x).attr("y2", l => l.target.y);
+    linkSel.attr("x1", l => l.source.x).attr("y1", l => l.source.y).attr("x2", l => l.target.x).attr("y2", l => l.target.y);
     nodeSel.attr("transform", d => `translate(${d.x},${d.y})`);
     labelSel.attr("x", d => d.x).attr("y", d => d.y);
   }
   simulation.on("tick", render);
   render();
 
-  // zoom so that all visible nodes fit into the chart
   function fitView(duration = 0) {
     const shown = nodes.filter(isVisible);
     if (!shown.length) return;
     const [x0, x1] = d3.extent(shown, d => d.x), [y0, y1] = d3.extent(shown, d => d.y);
-    const pad = 40;
-    const scale = Math.min(4, 0.95 / Math.max((x1 - x0 + 2 * pad) / width, (y1 - y0 + 2 * pad) / height));
-    const t = d3.zoomIdentity.translate(width / 2, height / 2).scale(scale).translate(-(x0 + x1) / 2, -(y0 + y1) / 2);
+    const k = Math.min(4, 0.92 / Math.max((x1 - x0 + 60) / width, (y1 - y0 + 60) / height));
+    const t = d3.zoomIdentity.translate(width / 2, height / 2).scale(k).translate(-(x0 + x1) / 2, -(y0 + y1) / 2);
     (duration ? svg.transition().duration(duration) : svg).call(zoom.transform, t);
   }
 
-  // ---- tooltip -----------------------------------------------------------------------------------
-  const tooltip = document.getElementById("tooltip");
+  // tooltip
+  const tooltip = $("tooltip");
   nodeSel
     .on("mouseenter", (e, d) => {
       highlight(d);
-      const rows = d.type === "cause"
-        ? [`Community: ${communityName(d.community)}`, `WHO group: ${CATEGORY_NAMES[d.category] || d.category}`,
-           `Median death rate: ${fmt(d.median_rate, 1)} per 100,000`, `Links: ${d.degree}`,
-           `Stability: ${d.community > 0 ? Math.round(d.stability * 100) + "%" : "–"}`]
-        : [`Indicator group: ${String(d.category).replace("_", " ")}`,
-           `Linked mostly to: ${d.community > 0 ? communityName(d.community) : "no links"}`, `Links: ${d.degree}`];
-      tooltip.innerHTML = `<b>${d.label}</b>` + rows.map(r => `<div class="row">${r}</div>`).join("");
+      tooltip.innerHTML = `<b>${d.label}</b>` + (d.type === "cause"
+        ? `${communityName(d.community)}<br>${fmt(d.median_rate, 1)} per 100k · ${d.degree} links`
+        : `indicator · ${d.degree} links`);
       tooltip.style.display = "block";
     })
     .on("mousemove", e => {
-      const x = Math.min(e.clientX + 14, window.innerWidth - tooltip.offsetWidth - 8);
-      const y = Math.min(e.clientY + 14, window.innerHeight - tooltip.offsetHeight - 8);
-      tooltip.style.left = x + "px"; tooltip.style.top = y + "px";
+      tooltip.style.left = Math.min(e.clientX + 12, innerWidth - tooltip.offsetWidth - 8) + "px";
+      tooltip.style.top = Math.min(e.clientY + 12, innerHeight - tooltip.offsetHeight - 8) + "px";
     })
     .on("mouseleave", () => { tooltip.style.display = "none"; highlight(selected); })
     .on("click", (e, d) => { e.stopPropagation(); select(d); });
 
-  // ---- visibility (filters) ---------------------------------------------------------------------
-  const isVisible = d => active.has(d.community) &&
-    (d.type === "cause" || document.getElementById("show-indicators").checked);
-
+  // filters
+  const isVisible = d => active.has(d.community) && (d.type === "cause" || $("show-indicators").checked);
   function linkVisible(l) {
     if (!isVisible(l.source) || !isVisible(l.target)) return false;
-    if (l.weight < +document.getElementById("min-weight").value - 1e-9) return false;
-    const sign = document.getElementById("link-sign").value;
-    if (l.type === "indicator-cause" && sign !== "all" && l.sign !== +sign) return false;
-    return true;
+    if (l.weight < +slider.value - 1e-9) return false;
+    const sign = $("link-sign").value;
+    return !(l.type === "indicator-cause" && sign !== "all" && l.sign !== +sign);
   }
-
   function update() {
-    const fade = document.getElementById("fade-unstable").checked;
-    const labels = document.getElementById("show-labels").checked;
     nodeSel.style("display", d => isVisible(d) ? null : "none");
-    nodeSel.selectAll("circle, rect")
-      .attr("fill", d => hollow(d) ? css("--surface") : nodeColor(d))
-      .attr("stroke", d => hollow(d) ? nodeColor(d) : css("--surface"))
-      .attr("stroke-width", d => hollow(d) ? 2.2 : 1.5)
-      .attr("fill-opacity", d => (fade && d.type === "cause") ? 0.2 + 0.8 * (d.stability || 0) : 1)
-      .attr("stroke-opacity", d => (fade && d.type === "cause" && hollow(d)) ? 0.2 + 0.8 * (d.stability || 0) : 1);
+    nodeSel.selectAll("circle, rect").attr("fill", nodeColor);
     linkSel.style("display", l => linkVisible(l) ? null : "none").attr("stroke", linkColor);
-    labelSel.style("display", d => (labels && isVisible(d)) ? null : "none");
-    drawLegend();
+    labelSel.style("display", d => ($("show-labels").checked && isVisible(d)) ? null : "none");
+    drawCommunities();
     highlight(selected);
   }
-
-  // hover / selection: dim everything that is not connected to the node
   function highlight(d) {
     if (!d) {
-      nodeSel.attr("opacity", 1);
-      linkSel.attr("stroke-opacity", l => l.type === "cause-cause" ? 0.22 : 0.45);
-      labelSel.attr("opacity", 1);
+      nodeSel.attr("opacity", 1); labelSel.attr("opacity", 1);
+      linkSel.attr("stroke-opacity", l => l.type === "cause-cause" ? 0.6 : 0.5);
       return;
     }
     const near = new Set([d.id, ...neighbours.get(d.id).map(n => n.id)]);
     nodeSel.attr("opacity", n => near.has(n.id) ? 1 : 0.12);
     labelSel.attr("opacity", n => near.has(n.id) ? 1 : 0.12);
-    linkSel.attr("stroke-opacity", l => (l.source.id === d.id || l.target.id === d.id) ? 0.85 : 0.03);
+    linkSel.attr("stroke-opacity", l => (l.source.id === d.id || l.target.id === d.id) ? 0.9 : 0.03);
   }
 
-  // ---- details panel ----------------------------------------------------------------------------
+  // details pane
   function select(d) {
-    selected = d;
-    selectedId = d ? d.id : null;
+    selected = d; selectedId = d ? d.id : null;
     highlight(d);
-    const panel = document.getElementById("details");
-    if (!d) { panel.innerHTML = `<p class="hint">Click a node to see its links.</p>`; return; }
-    const list = neighbours.get(d.id).map(n => ({ ...n, node: byId.get(n.id) }))
-      .sort((a, b) => Math.abs(b.rho) - Math.abs(a.rho));
-    const meta = d.type === "cause"
-      ? `${communityName(d.community)} · ${fmt(d.median_rate, 1)} deaths per 100,000 (median) · stability ${d.community > 0 ? Math.round(d.stability * 100) + "%" : "–"}`
-      : `Indicator (${String(d.category).replace("_", " ")}) · linked mostly to ${d.community > 0 ? communityName(d.community) : "nothing"}`;
-    panel.innerHTML =
-      `<h2>${d.label}</h2><p class="meta">${meta}</p>` +
-      (list.length ? `<table>${list.map(n =>
-        `<tr><td>${n.node.label} ${n.node.type === "indicator" ? '<span class="tag">indicator</span>' : ""}</td>` +
-        `<td class="num">${n.rho > 0 ? "+" : "−"}${Math.abs(n.rho).toFixed(2)}</td></tr>`).join("")}</table>`
-        : `<p class="hint">No links above the threshold.</p>`) +
-      `<p class="hint" style="margin-top:10px">Numbers: ${data.meta.method === "glasso"
-        ? "links between causes = direct link strength (partial correlation given all other causes); links to indicators = partial Spearman correlation (GDP removed)"
-        : "partial Spearman correlation (GDP per capita removed)"}.</p>`;
+    const pane = $("details");
+    if (!d) { pane.innerHTML = `<p class="empty">No node selected</p>`; return; }
+    const list = neighbours.get(d.id).map(n => ({ ...n, node: byId.get(n.id) })).sort((a, b) => Math.abs(b.rho) - Math.abs(a.rho));
+    const kv = d.type === "cause"
+      ? [["WHO group", CATEGORY_NAMES[d.category] || d.category], ["Death rate (median)", fmt(d.median_rate, 2)],
+         ["Links", d.degree], ["Strength", fmt(d.strength)], ["Betweenness", fmt(d.betweenness, 3)],
+         ["Stability", d.community > 0 ? fmt(d.stability) : "–"]]
+      : [["Group", String(d.category).replace("_", " ")], ["Links", d.degree]];
+    pane.innerHTML = `<h2>${d.label}</h2>
+      <div class="sub">${d.type === "cause" ? `<span class="dot" style="background:${communityColor(d.community)}"></span>${communityName(d.community)}` : "Indicator"}</div>
+      <div class="kv">${kv.map(([k, v]) => `<span>${k}</span><span>${v}</span>`).join("")}</div>
+      ${list.length ? `<table><thead><tr><th>Linked to</th><th class="num">${d.type === "cause" ? "Value" : "ρ"}</th></tr></thead><tbody>${
+        list.map(n => `<tr data-id="${n.id}"><td>${n.node.label}${n.node.type === "indicator" ? " ▪" : ""}</td><td class="num">${
+          n.rho > 0 ? "+" : "−"}${Math.abs(n.rho).toFixed(2)}</td></tr>`).join("")}</tbody></table>` : `<p class="empty">No links</p>`}`;
+    pane.querySelectorAll("tbody tr").forEach(tr => tr.onclick = () => focusNode(byId.get(tr.dataset.id)));
   }
-
-  // ---- legend: one entry per community, click to show / hide --------------------------------------
-  function drawLegend() {
-    const legend = document.getElementById("legend");
-    const mode = document.getElementById("color-by").value;
-    legend.innerHTML = "";
-    communities.forEach(c => {
-      const count = nodes.filter(d => d.community === c && (d.type === "cause" || document.getElementById("show-indicators").checked)).length;
-      if (!count) return;   // nothing to show (e.g. only unlinked indicators while indicators are hidden)
-      const item = document.createElement("div");
-      item.className = "legend-item" + (active.has(c) ? "" : " off");
-      const color = mode === "community" ? (c > 0 ? palette()[(c - 1) % palette().length] : css("--neutral-node")) : "transparent";
-      const ring = mode === "community" && c > palette().length;   // hollow ring for communities 9+
-      const swatchStyle = ring ? `background:transparent;border:2.2px solid ${color};width:11px;height:11px`
-                               : `background:${color};${mode === "community" ? "" : "border:1px solid var(--axis)"}`;
-      item.innerHTML = `<span class="swatch" style="${swatchStyle}"></span>` +
-                       `${communityName(c)} <span style="color:var(--muted)">(${count})</span>`;
-      item.title = "click to show / hide";
-      item.addEventListener("click", () => { active.has(c) ? active.delete(c) : active.add(c); update(); });
-      legend.appendChild(item);
-    });
-    if (mode === "category") {
-      categories.forEach((cat, i) => {
-        const item = document.createElement("div");
-        item.className = "legend-item";
-        item.style.cursor = "default";
-        item.innerHTML = `<span class="swatch" style="background:${palette()[i]}"></span>${CATEGORY_NAMES[cat]}`;
-        legend.appendChild(item);
-      });
-    }
-  }
-
-  // ---- table view (all nodes) ---------------------------------------------------------------------
-  const rows = [...nodes].sort((a, b) => (a.type === b.type ? b.degree - a.degree : a.type === "cause" ? -1 : 1));
-  document.getElementById("table").innerHTML =
-    `<thead><tr><th>Name</th><th>Type</th><th>Community</th><th>WHO group / indicator group</th>` +
-    `<th class="num">Median rate</th><th class="num">Links</th><th class="num">Stability</th></tr></thead><tbody>` +
-    rows.map(d => `<tr><td>${d.label}</td><td>${d.type}</td><td>${communityName(d.community)}</td>` +
-      `<td>${String(d.category).replace("_", " ")}</td><td class="num">${d.type === "cause" ? fmt(d.median_rate, 1) : "–"}</td>` +
-      `<td class="num">${d.degree}</td><td class="num">${d.type === "cause" && d.community > 0 ? Math.round(d.stability * 100) + "%" : "–"}</td></tr>`).join("") +
-    `</tbody>`;
-
-  // ---- search ------------------------------------------------------------------------------------
-  document.getElementById("node-list").innerHTML = nodes.map(d => `<option value="${d.label}">`).join("");
-  document.getElementById("search").onchange = e => {
-    const d = nodes.find(n => n.label.toLowerCase() === e.target.value.trim().toLowerCase());
-    if (!d) return;
+  function focusNode(d) {
     active.add(d.community);
-    if (d.type === "indicator") document.getElementById("show-indicators").checked = true;
-    update();
-    select(d);
-    svg.transition().duration(600).call(zoom.transform,
-      d3.zoomIdentity.translate(width / 2, height / 2).scale(2.2).translate(-d.x, -d.y));
+    if (d.type === "indicator") $("show-indicators").checked = true;
+    showView("network"); update(); select(d);
+    svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity.translate(width / 2, height / 2).scale(2.2).translate(-d.x, -d.y));
+  }
+
+  // communities in the left pane: click to show / hide
+  function drawCommunities() {
+    const box = $("communities");
+    box.innerHTML = "";
+    communities.forEach(c => {
+      const count = causes.filter(d => d.community === c).length;
+      const item = document.createElement("button");
+      item.className = "nav-item" + (active.has(c) ? "" : " off");
+      item.innerHTML = `<span class="dot" style="background:${communityColor(c)}"></span>${c > 0 ? c + " " : ""}${communityName(c)}<span class="count">${count}</span>`;
+      item.onclick = () => { active.has(c) ? active.delete(c) : active.add(c); update(); };
+      box.appendChild(item);
+    });
+  }
+
+  // tables
+  renderTable($("nodes-table"), [
+    { key: "label", label: "Name" }, { key: "type", label: "Type" },
+    { key: "community", label: "Community", html: r => r.type === "cause" ? `<span class="dot" style="display:inline-block;margin-right:6px;background:${communityColor(r.community)}"></span>${communityName(r.community)}` : "–" },
+    { key: "group", label: "Group" },
+    { key: "median_rate", label: "Death rate", num: true }, { key: "degree", label: "Links", num: true, digits: 0 },
+    { key: "strength", label: "Strength", num: true }, { key: "betweenness", label: "Betweenness", num: true, digits: 3 },
+    { key: "stability", label: "Stability", num: true },
+  ], nodes.map(d => d.type === "cause"
+    ? { ...d, group: CATEGORY_NAMES[d.category] || d.category }
+    : { ...d, group: String(d.category).replace(/_/g, " "), median_rate: null, strength: null, betweenness: null, stability: null }),
+  r => focusNode(byId.get(r.id)));
+  const linkRows = links.map(l => ({ a: l.source.label, b: l.target.label, type: l.type, weight: l.weight, rho: l.rho, node: l.source }));
+  renderTable($("links-table"), [
+    { key: "a", label: "Source" }, { key: "b", label: "Target" }, { key: "type", label: "Type" },
+    { key: "weight", label: "Weight", num: true, digits: 3 }, { key: "rho", label: "Value", num: true, digits: 3 },
+  ], linkRows, r => focusNode(r.node));
+
+  // search
+  $("node-list").innerHTML = nodes.map(d => `<option value="${d.label}">`).join("");
+  $("search").onchange = e => {
+    const d = nodes.find(n => n.label.toLowerCase() === e.target.value.trim().toLowerCase());
+    if (d) focusNode(d);
   };
 
-  // ---- controls ----------------------------------------------------------------------------------
-  // on-properties (not addEventListener): switching networks replaces the handlers instead of adding more
-  ["color-by", "show-indicators", "link-sign", "fade-unstable", "show-labels"].forEach(id =>
-    document.getElementById(id).onchange = update);
-  document.getElementById("min-weight").oninput = e => {
-    document.getElementById("min-weight-value").textContent = (+e.target.value).toFixed(2);
-    update();
-  };
-  document.getElementById("reset").onclick = () => {
+  // controls (on-properties: switching networks replaces the handlers)
+  ["color-by", "show-indicators", "link-sign", "show-labels"].forEach(id => $(id).onchange = update);
+  slider.oninput = () => { $("min-weight-value").textContent = (+slider.value).toFixed(2); update(); };
+  $("reset").onclick = () => {
     communities.forEach(c => active.add(c));
-    document.getElementById("color-by").value = "community";
-    document.getElementById("show-indicators").checked = false;
-    document.getElementById("link-sign").value = "all";
-    slider.value = slider.min;
-    document.getElementById("min-weight-value").textContent = (+slider.min).toFixed(2);
-    document.getElementById("fade-unstable").checked = false;
-    document.getElementById("show-labels").checked = false;
-    document.getElementById("search").value = "";
-    select(null);
-    update();
-    fitView(500);
+    $("color-by").value = "community"; $("show-indicators").checked = false; $("link-sign").value = "all";
+    slider.value = slider.min; $("min-weight-value").textContent = (+slider.min).toFixed(2);
+    $("show-labels").checked = false; $("search").value = "";
+    select(null); update(); fitView(400);
   };
 
   currentUpdate = update;
   update();
   fitView();
-  if (selectedId && byId.has(selectedId)) select(byId.get(selectedId));   // keep the clicked node when switching
-  else select(null);
+  if (selectedId && byId.has(selectedId)) select(byId.get(selectedId)); else select(null);
 }
 </script>
 </body>
