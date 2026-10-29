@@ -9,13 +9,13 @@ import pandas as pd
 
 import build_network as nb
 
-# Config +++
+# Settings
 DATA_FILE = Path("./../data/processed/clean_2019.csv")
 NETWORK_DIR = Path("./../data/network")
 OUT_DIR = Path("./../figures")
 
-STRONG = 0.5   # |correlation| that counts as a strong link in figure 1
-EXAMPLE_PAIRS = [   # cause pairs shown in figure 2: (cause a, cause b)
+STRONG = 0.5   # Strong-link threshold for Figure 1.
+EXAMPLE_PAIRS = [   # Example pairs for Figure 2.
     ("hiv_aids", "drowning"),
     ("alcohol_use_disorders", "cirrhosis_due_to_alcohol_use"),
     ("measles", "whooping_cough"),
@@ -34,14 +34,13 @@ COMMUNITY_NAMES = {
     10: "HIV, cervical cancer & violence",
     11: "Drug use & head-and-neck cancers",
 }
-COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"]  # same as viewer
+COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"]  # Match viewer colors.
 GREY, INK, MUTED = "#b8b8b8", "#222222", "#6b6b6b"
 CATEGORY_COLORS = {"communicable": COLORS[1], "noncommunicable": COLORS[0], "injuries": COLORS[2]}
-ONLY_HERE = "#e34948"   # comparison figure: links that exist in only one of the two networks
-PULL = 15      # figure 3 layout: links inside a community pull this much harder (keeps communities apart)
-WIDTH = 7.0    # full text width in inches
+ONLY_HERE = "#e34948"   # Compare network-only links.
+PULL = 15      # Strengthen within-community layout.
+WIDTH = 7.0    # Full text width, inches.
 DPI = 300
-# Config ---
 
 plt.rcParams.update({
     "font.size": 8, "axes.titlesize": 9, "axes.labelsize": 8, "axes.edgecolor": MUTED,
@@ -49,40 +48,20 @@ plt.rcParams.update({
     "axes.grid": True, "grid.color": "#e6e6e6", "grid.linewidth": 0.6, "axes.axisbelow": True,
 })
 
-
 def pair_values(matrix):
-    """All values above the diagonal of a square matrix (one per pair).
-
-    Parameters
-    matrix: pandas.DataFrame, square correlation matrix
-
-    Returns
-    numpy.ndarray
-    """
+    """Return unique upper-triangle values."""
     return matrix.values[np.triu_indices(len(matrix), k=1)]
 
-
 def save(fig, name):
-    """Save a figure as PNG (slides) and PDF (LaTeX).
-
-    Parameters
-    fig: matplotlib.figure.Figure
-    name: str, file name without extension
-    """
+    """Save PNG and PDF versions."""
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT_DIR / f"{name}.png", dpi=DPI, bbox_inches="tight")
     fig.savefig(OUT_DIR / f"{name}.pdf", bbox_inches="tight")
     plt.close(fig)
     print("saved", name)
 
-
 def fig_wealth(raw, adjusted):
-    """Figure 1: cause-pair correlations before and after removing GDP.
-
-    Parameters
-    raw: pandas.DataFrame, Spearman correlation between causes
-    adjusted: pandas.DataFrame, the same after removing GDP
-    """
+    """Plot raw and adjusted correlations."""
     fig, ax = plt.subplots(figsize=(WIDTH / 2, 2.3))
     bins = np.linspace(-1, 1, 41)
     for values, color, name in [(pair_values(raw), COLORS[1], "raw"), (pair_values(adjusted), COLORS[0], "GDP removed")]:
@@ -90,20 +69,15 @@ def fig_wealth(raw, adjusted):
         ax.hist(values, bins=bins, histtype="step", linewidth=1.6, color=color,
                 label=f"{name}: {strong:.0%} of pairs |ρ| ≥ {STRONG}")
     ax.axvline(0, color=MUTED, linewidth=0.8)
-    ax.set_ylim(0, ax.get_ylim()[1] * 1.35)   # room for the legend
+    ax.set_ylim(0, ax.get_ylim()[1] * 1.35)   # Reserve legend space.
     ax.set_xlabel("Spearman ρ between two causes of death")
     ax.set_ylabel("cause pairs")
     ax.set_title("Most co-occurrence is wealth", loc="left")
     ax.legend(frameon=False, loc="upper left", fontsize=6.5)
     save(fig, "fig1_wealth")
 
-
 def fig_direct(raw, adjusted, direct):
-    """Figure 2: link strength of example pairs - raw, GDP removed, direct link (graphical lasso).
-
-    Parameters
-    raw, adjusted, direct: pandas.DataFrame, cause-cause matrices
-    """
+    """Plot example link strengths."""
     fig, ax = plt.subplots(figsize=(WIDTH / 2, 2.3))
     names = [f"{nb.label(a)} –\n{nb.label(b)}" for a, b in EXAMPLE_PAIRS]
     y = np.arange(len(EXAMPLE_PAIRS))
@@ -120,45 +94,22 @@ def fig_direct(raw, adjusted, direct):
     ax.legend(frameon=False, fontsize=6.5, loc="lower right")
     save(fig, "fig2_direct_links")
 
-
 def node_style(community):
-    """Fill and edge colour of a node: 8 filled colours, hollow rings for community 9+, grey if isolated.
-
-    Parameters
-    community: int
-
-    Returns
-    tuple (face colour, edge colour)
-    """
+    """Return colors for a node."""
     if community == 0:
         return GREY, GREY
     color = COLORS[(community - 1) % len(COLORS)]
     return (color, "white") if community <= len(COLORS) else ("white", color)
 
-
 def community_layout(G, community):
-    """Node positions where links inside a community pull harder, so communities sit apart.
-
-    Parameters
-    G: networkx.Graph, edge attribute "weight"
-    community: dict or pandas.Series, node -> community number (0 = isolated)
-
-    Returns
-    dict, node -> (x, y)
-    """
+    """Position communities with stronger internal links."""
     for a, b in G.edges:
         same = community[a] == community[b] > 0
         G.edges[a, b]["pull"] = G.edges[a, b]["weight"] * (PULL if same else 1)
     return nx.spring_layout(G, weight="pull", seed=nb.SEED, k=0.3, iterations=500)
 
-
 def cause_graph(nodes, edges):
-    """Cause-cause network from nodes.csv and edges.csv (indicators left out).
-
-    Returns
-    networkx.Graph
-    pandas.DataFrame, cause nodes (index = id)
-    """
+    """Build the cause-only graph."""
     causes = nodes[nodes["type"] == "cause"].set_index("id")
     G = nx.Graph()
     G.add_nodes_from(causes.index)
@@ -166,14 +117,8 @@ def cause_graph(nodes, edges):
     G.add_weighted_edges_from(links[["source", "target", "weight"]].itertuples(index=False))
     return G, causes
 
-
 def fig_network(nodes, edges):
-    """Figure 3: the cause network (direct links), coloured by community, numbers at the community centres.
-
-    Parameters
-    nodes: pandas.DataFrame, nodes_glasso.csv
-    edges: pandas.DataFrame, edges_glasso.csv
-    """
+    """Plot causes by community."""
     G, causes = cause_graph(nodes, edges)
     pos = community_layout(G, causes["community"])
 
@@ -185,7 +130,7 @@ def fig_network(nodes, edges):
         ax.scatter([pos[n][0] for n in group.index], [pos[n][1] for n in group.index],
                    s=12 + 6 * group["degree"], c=face, edgecolors=edge, linewidths=1.2, zorder=3,
                    label=f"{community}  {COMMUNITY_NAMES[community]} ({len(group)})" if community else f"isolated ({len(group)})")
-    for community, group in causes[causes["community"] > 0].groupby("community"):   # number at the centre
+    for community, group in causes[causes["community"] > 0].groupby("community"):   # Community label at center.
         x, y = np.mean([pos[n] for n in group.index], axis=0)
         ax.text(x, y, str(community), fontsize=9, fontweight="bold", color=INK, ha="center", va="center",
                 zorder=5, path_effects=[pe.withStroke(linewidth=3, foreground="white")])
@@ -193,17 +138,8 @@ def fig_network(nodes, edges):
     ax.legend(frameon=False, fontsize=6.5, loc="center left", bbox_to_anchor=(1.0, 0.5), markerscale=0.8)
     save(fig, "fig3_network")
 
-
 def fig_compare(adjusted, direct, nodes, edges):
-    """Figure 6: co-occurrence network vs direct-link network, same node positions.
-
-    Links that exist in both networks are grey, links that exist only in one panel are red.
-
-    Parameters
-    adjusted: pandas.DataFrame, cause correlations with GDP removed (co-occurrence)
-    direct: pandas.DataFrame, partial correlations from the graphical lasso (direct links)
-    nodes, edges: pandas.DataFrame, nodes.csv and edges.csv (for categories and the layout)
-    """
+    """Compare co-occurrence and direct links."""
     G, causes = cause_graph(nodes, edges)
     pos = community_layout(G, causes["community"])
     nets = [("Co-occurrence (GDP removed, |ρ| ≥ 0.35)", nb.build_network(adjusted, nb.THRESHOLD["correlation"])),
@@ -228,13 +164,8 @@ def fig_compare(adjusted, direct, nodes, edges):
     fig.legend(handles, labels, loc="lower center", ncol=5, frameon=False, fontsize=6.5, bbox_to_anchor=(0.5, -0.04))
     save(fig, "fig6_compare_networks")
 
-
 def fig_stability(nodes):
-    """Figure 4: bootstrap stability per community (mean stability of its causes).
-
-    Parameters
-    nodes: pandas.DataFrame, nodes_glasso.csv
-    """
+    """Plot mean community stability."""
     causes = nodes[(nodes["type"] == "cause") & (nodes["community"] > 0)]
     table = causes.groupby("community")["stability"].mean().sort_values()
     fig, ax = plt.subplots(figsize=(WIDTH / 2, 2.6))
@@ -248,13 +179,8 @@ def fig_stability(nodes):
     ax.set_title("Community stability (200 resamples)", loc="left")
     save(fig, "fig4_stability")
 
-
 def fig_expected(expected):
-    """Figure 5: health-system indicator vs cause, for links expected from medical knowledge.
-
-    Parameters
-    expected: pandas.DataFrame, expected_links.csv
-    """
+    """Plot expected indicator links."""
     table = expected.assign(name=expected["indicator"].str.replace("_", " ") + " → " + expected["cause"])
     table = table.sort_values("rho")
     fig, ax = plt.subplots(figsize=(WIDTH / 2, 4.2))
@@ -272,10 +198,12 @@ def fig_expected(expected):
     ax.legend(frameon=False, fontsize=6.5, loc="lower right")
     save(fig, "fig5_expected_links")
 
-
 def main():
+    # Load analysis data.
     data = pd.read_csv(DATA_FILE)
     causes = [c for c in data.columns if c.startswith("death_asdr_")]
+
+    # Build correlation matrices.
     raw = data[causes].corr(method="spearman")
     adjusted = nb.remove_control(data[causes], data[nb.CONTROL]).corr()
     with warnings.catch_warnings():
@@ -285,13 +213,13 @@ def main():
     edges = pd.read_csv(NETWORK_DIR / "edges_glasso.csv")
     expected = pd.read_csv(NETWORK_DIR / "expected_links.csv")
 
+    # Render all figures.
     fig_wealth(raw, adjusted)
     fig_direct(raw, adjusted, direct)
     fig_network(nodes, edges)
     fig_stability(nodes)
     fig_expected(expected)
     fig_compare(adjusted, direct, nodes, edges)
-
 
 if __name__ == "__main__":
     main()
